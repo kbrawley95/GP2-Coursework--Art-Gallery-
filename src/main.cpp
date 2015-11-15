@@ -157,9 +157,18 @@ void initScene()
 
 	gameObjects.push_back(currentGameObject);
 
+	//Model 2(Sofa)
+	modelPath = ASSET_PATH + MODEL_PATH + "/Sofa.fbx";
+	currentGameObject = loadFBXFromFile(modelPath);
+	vsPath = ASSET_PATH + SHADER_PATH + "/specularVS.glsl";
+	fsPath = ASSET_PATH + SHADER_PATH + "/specularFS.glsl";
+	currentGameObject->loadShader(vsPath, fsPath);
+
+	gameObjects.push_back(currentGameObject);
+	currentGameObject->setPosition(vec3(50.0f, 10.0f, 0.0f));
 }
 
-void cleanUpFrambuffer()
+void cleanUpFramebuffer()
 {
 	glDeleteProgram(fullScreenShaderProgram);
 	glDeleteBuffers(1, &fullScreenVBO);
@@ -171,7 +180,7 @@ void cleanUpFrambuffer()
 
 void cleanUp()
 {
-	cleanUpFrambuffer();
+	cleanUpFramebuffer();
 	gameObjects.clear();
 }
 
