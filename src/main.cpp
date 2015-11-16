@@ -126,46 +126,46 @@ void initScene()
 	//createFramebuffer();
 
 	//Model 1 (Armored Vehicle)
-	string modelPath = ASSET_PATH + MODEL_PATH + "/armoredrecon.fbx";
+	string modelPath = ASSET_PATH + MODEL_PATH + "/Art_Gallery1.fbx";
 	auto currentGameObject = loadFBXFromFile(modelPath);
 
 	//Specular Lighting Shaders
-	/*string vsPath = ASSET_PATH + SHADER_PATH + "/specularVS.glsl";
-	string fsPath = ASSET_PATH + SHADER_PATH + "/specularFS.glsl";*/
+	string vsPath = ASSET_PATH + SHADER_PATH + "/specularVS.glsl";
+	string fsPath = ASSET_PATH + SHADER_PATH + "/specularFS.glsl";
 
-	string vsPath = ASSET_PATH + SHADER_PATH + "/textureVS.glsl";
-	string fsPath = ASSET_PATH + SHADER_PATH + "/textureFS.glsl";
+	/*string vsPath = ASSET_PATH + SHADER_PATH + "/textureVS.glsl";
+	string fsPath = ASSET_PATH + SHADER_PATH + "/textureFS.glsl";*/
 
 	currentGameObject->loadShader(vsPath, fsPath);
-
+/*
 	string texturePath = ASSET_PATH + TEXTURE_PATH + "/armoredrecon_diff.png";
-	currentGameObject->loadDiffuseMap(texturePath);
+	currentGameObject->loadDiffuseMap(texturePath);*/
 
 	gameObjects.push_back(currentGameObject);
 	currentGameObject->setPosition(vec3(0.0f, -10.0f, 0.0f));
 
 
-	//Model 2 (Tank)
-	modelPath = ASSET_PATH + MODEL_PATH + "/Tank1.fbx";
-	currentGameObject = loadFBXFromFile(modelPath);
-	vsPath = ASSET_PATH + SHADER_PATH + "/textureVS.glsl";
-	fsPath = ASSET_PATH + SHADER_PATH + "/textureFS.glsl";
-	currentGameObject->loadShader(vsPath, fsPath);
+	////Model 2 (Tank)
+	//modelPath = ASSET_PATH + MODEL_PATH + "/Tank1.fbx";
+	//currentGameObject = loadFBXFromFile(modelPath);
+	//vsPath = ASSET_PATH + SHADER_PATH + "/textureVS.glsl";
+	//fsPath = ASSET_PATH + SHADER_PATH + "/textureFS.glsl";
+	//currentGameObject->loadShader(vsPath, fsPath);
 
-	texturePath = ASSET_PATH + TEXTURE_PATH + "/Tank1DF.png";
-	currentGameObject->loadDiffuseMap(texturePath);
+	//texturePath = ASSET_PATH + TEXTURE_PATH + "/Tank1DF.png";
+	//currentGameObject->loadDiffuseMap(texturePath);
 
-	gameObjects.push_back(currentGameObject);
+	//gameObjects.push_back(currentGameObject);
 
-	//Model 2(Sofa)
-	modelPath = ASSET_PATH + MODEL_PATH + "/Sofa.fbx";
-	currentGameObject = loadFBXFromFile(modelPath);
-	vsPath = ASSET_PATH + SHADER_PATH + "/specularVS.glsl";
-	fsPath = ASSET_PATH + SHADER_PATH + "/specularFS.glsl";
-	currentGameObject->loadShader(vsPath, fsPath);
+	////Model 2(Sofa)
+	//modelPath = ASSET_PATH + MODEL_PATH + "/Basic_House.fbx";
+	//currentGameObject = loadFBXFromFile(modelPath);
+	//vsPath = ASSET_PATH + SHADER_PATH + "/specularVS.glsl";
+	//fsPath = ASSET_PATH + SHADER_PATH + "/specularFS.glsl";
+	//currentGameObject->loadShader(vsPath, fsPath);
 
-	gameObjects.push_back(currentGameObject);
-	currentGameObject->setPosition(vec3(50.0f, 10.0f, 0.0f));
+	//gameObjects.push_back(currentGameObject);
+	//currentGameObject->setPosition(vec3(50.0f, 10.0f, 0.0f));
 }
 
 void cleanUpFramebuffer()
@@ -384,6 +384,14 @@ int main(int argc, char * arg[])
 					break;
 				case SDLK_DOWN:
 					cameraPosition.y += 2.0f;
+					break;
+
+				case SDLK_q:
+					cameraPosition.z -= 2.0f;
+					break;
+
+				case SDLK_e:
+					cameraPosition.z += 2.0f;
 					break;
 				default:
 					break;
