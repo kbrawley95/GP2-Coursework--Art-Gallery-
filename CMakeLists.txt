@@ -1,26 +1,28 @@
 cmake_minimum_required (VERSION 2.8)
-project (GP2-Coursework--Art-Gallery-)
+PROJECT (GP2-Coursework--Art-Gallery-)
 
-list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake")
-list( APPEND CMAKE_CXX_FLAGS "-std=c++0x ${CMAKE_CXX_FLAGS} -ftest-coverage -fprofile-arcs")
+LIST(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake")
+LIST(APPEND CMAKE_CXX_FLAGS "-std=c++0x ${CMAKE_CXX_FLAGS} -ftest-coverage -fprofile-arcs")
 
-set(CMAKE_PREFIX_PATH "C:/Users/Kieran/Documents/Uni Work/Games Programming/OpenGLFramework/glew-1.12.0-win32/glew-1.12.0/include")
-set(CMAKE_LIBRARY_PATH "C:/Users/Kieran/Documents/Uni Work/Games Programming/OpenGLFramework/glew-1.12.0-win32/glew-1.12.0/lib/Release/x64")
+SET(CMAKE_PREFIX_PATH "C:/Users/Kieran/Documents/Uni Work/Games Programming/OpenGLFramework/glew-1.12.0-win32/glew-1.12.0/include")
+SET(CMAKE_LIBRARY_PATH "C:/Users/Kieran/Documents/Uni Work/Games Programming/OpenGLFramework/glew-1.12.0-win32/glew-1.12.0/lib/Release/x64")
 
-find_package(OpenGL REQUIRED)
-find_package(SDL2 REQUIRED)
-find_package(SDL2_Image REQUIRED)
-find_package(SDL2_TTF REQUIRED)
-find_package(GLEW REQUIRED)
-find_package(GLM REQUIRED)
-find_package(FBX REQUIRED)
+FIND_PACKAGE(OpenGL REQUIRED)
+FIND_PACKAGE(SDL2 REQUIRED)
+FIND_PACKAGE(SDL2_Image REQUIRED)
+FIND_PACKAGE(SDL2_TTF REQUIRED)
+FIND_PACKAGE(GLEW REQUIRED)
+FIND_PACKAGE(GLM REQUIRED)
+FIND_PACKAGE(FBX REQUIRED)
 
-add_executable(GP2-Coursework--Art-Gallery- src/main.cpp src/Graphics.cpp src/Shader.cpp src/Texture.cpp src/FBXLoader.cpp src/FileSystem.cpp
-include/Common.h include/FBXLoader.h include/Graphics.h include/Shader.h include/Vertices.h include/Texture.h include/Mesh.h include/FileSystem.h)
+FILE(GLOB C_SRCS src/*.cpp include/*.h Core/src/*.cpp Core/include/*.h)
+ADD_EXECUTABLE(GP2-Coursework--Art-Gallery- ${C_SRCS})
 
-include_directories(GP2-Coursework--Art-Gallery- include/ ${OPENGL_INCLUDE_DIRS} ${SDL2_INCLUDE_DIR} ${GLEW_INCLUDE_DIRS} ${GLM_INCLUDE_DIRS} ${SDL2IMAGE_INCLUDE_DIR} ${SDL2_TTF_INCLUDE_DIR} ${FBX_INCLUDE_DIR})
+ADD_SUBDIRECTORY(Core)
+
+INCLUDE_DIRECTORIES(GP2-Coursework--Art-Gallery- include/ Core/include/ ${OPENGL_INCLUDE_DIRS} ${SDL2_INCLUDE_DIR} ${GLEW_INCLUDE_DIRS} ${GLM_INCLUDE_DIRS} ${SDL2IMAGE_INCLUDE_DIR} ${SDL2_TTF_INCLUDE_DIR} ${FBX_INCLUDE_DIR})
 # create the program
-target_link_libraries(GP2-Coursework--Art-Gallery- ${SDL2_LIBRARY} ${OPENGL_LIBRARIES} ${GLEW_LIBRARIES} ${SDL2IMAGE_LIBRARY} ${SDL2_TTF_LIBRARY} ${FBX_LIBRARY})
+TARGET_LINK_LIBRARIES(GP2-Coursework--Art-Gallery- ${SDL2_LIBRARY} ${OPENGL_LIBRARIES} ${GLEW_LIBRARIES} ${SDL2IMAGE_LIBRARY} ${SDL2_TTF_LIBRARY} ${FBX_LIBRARY})
 
 if (MSVC)
 add_custom_command(TARGET GP2-Coursework--Art-Gallery-  POST_BUILD
