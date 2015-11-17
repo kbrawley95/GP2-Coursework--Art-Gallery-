@@ -1,328 +1,22 @@
-#include "Common.h"
-#include "Graphics.h"
-#include "Vertices.h"
-#include "Shader.h"
-#include "Texture.h"
-#include "Mesh.h"
-#include "FBXLoader.h"
-#include "FileSystem.h"
-#include "Scene.h"
+#include "Core.h"
 
-//matrices
-mat4 viewMatrix;
-mat4 projMatrix;
-
-mat4 MVPMatrix;
-
-Scene* currentScene;
-
-GLuint currentShaderProgam = 0;
-GLuint currentDiffuseMap = 0;
-
-
-vec4 ambientLightColour = vec4(1.0f, 1.0f, 1.0f, 1.0f);
-vec4 diffuseLightColour = vec4(1.0f, 1.0f, 1.0f, 1.0f);
-vec4 specularLightColour = vec4(1.0f, 1.0f, 1.0f, 1.0f);
-float specularPower = 25.0f;
-
-vec3 lightDirection = vec3(0.0f, 0.0f, 1.0f);
-vec3 cameraPosition = vec3(0.0f, 0.0f, 20.0f);
-
-//for Framebuffer
-GLuint FBOTexture;
-GLuint FBODepthBuffer;
-GLuint frameBufferObject;
-GLuint fullScreenVAO;
-GLuint fullScreenVBO;
-GLuint fullScreenShaderProgram;
-const int FRAME_BUFFER_WIDTH = 640;
-const int FRAME_BUFFER_HEIGHT = 480;
-
-//timing
-unsigned int lastTicks, currentTicks;
-float elapsedTime;
-float totalTime;
-
-vec2 screenResolution = vec2(FRAME_BUFFER_WIDTH, FRAME_BUFFER_HEIGHT);
-
-SDL_Window* window;
-SDL_GLContext glcontext;
-
-void SetCurrentScene(Scene* scene)
+Core::Core(int width, int height)
 {
-	currentScene = scene;
-}
-
-void createFramebuffer()
-{
-	glActiveTexture(GL_TEXTURE0);
-	glGenTextures(1, &FBOTexture);
-	glBindTexture(GL_TEXTURE_2D, FBOTexture);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, FRAME_BUFFER_WIDTH, FRAME_BUFFER_HEIGHT, 0, GL_RGBA,
-		GL_UNSIGNED_BYTE, NULL);
-
-
-	glGenRenderbuffers(1, &FBODepthBuffer);
-	glBindRenderbuffer(GL_RENDERBUFFER, FBODepthBuffer);
-	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT32, FRAME_BUFFER_WIDTH, FRAME_BUFFER_HEIGHT);
-	glBindRenderbuffer(GL_RENDERBUFFER, 0);
-
-	glGenFramebuffers(1, &frameBufferObject);
-	glBindFramebuffer(GL_FRAMEBUFFER, frameBufferObject);
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, FBOTexture, 0);
-	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, FBODepthBuffer);
-
-	GLenum status;
-	if ((status = glCheckFramebufferStatus(GL_FRAMEBUFFER)) != GL_FRAMEBUFFER_COMPLETE) {
-		cout << "Issue with Framebuffers" << endl;
-	}
-	float vertices[] = {
-		-1, -1,
-		1, -1,
-		-1, 1,
-		1, 1,
-
-	};
-
-	glGenVertexArrays(1, &fullScreenVAO);
-	glBindVertexArray(fullScreenVAO);
-
-	glGenBuffers(1, &fullScreenVBO);
-	glBindBuffer(GL_ARRAY_BUFFER, fullScreenVBO);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-
-	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(
-		0,  // attribute
-		2,                  // number of elements per vertex, here (x,y)
-		GL_FLOAT,           // the type of each element
-		GL_FALSE,           // take our values as-is
-		0,                  // no extra data between each position
-		0                   // offset of first element
-		);
-
-	GLuint vertexShaderProgram = 0;
-	string vsPath = ASSET_PATH + SHADER_PATH + "/simplePostProcessVS.glsl";
-	vertexShaderProgram = loadShaderFromFile(vsPath, VERTEX_SHADER);
-	checkForCompilerErrors(vertexShaderProgram);
-
-	GLuint fragmentShaderProgram = 0;
-	string fsPath = ASSET_PATH + SHADER_PATH + "/simplePostProcessFS.glsl";
-	fragmentShaderProgram = loadShaderFromFile(fsPath, FRAGMENT_SHADER);
-	checkForCompilerErrors(fragmentShaderProgram);
-
-	fullScreenShaderProgram = glCreateProgram();
-	glAttachShader(fullScreenShaderProgram, vertexShaderProgram);
-	glAttachShader(fullScreenShaderProgram, fragmentShaderProgram);
-
-	//Link attributes
-	glBindAttribLocation(fullScreenShaderProgram, 0, "vertexPosition");
-
-	glLinkProgram(fullScreenShaderProgram);
-	checkForLinkErrors(fullScreenShaderProgram);
-	//now we can delete the VS & FS Programs
-	glDeleteShader(vertexShaderProgram);
-	glDeleteShader(fragmentShaderProgram);
-}
-
-void initScene()
-{
-	currentTicks = SDL_GetTicks();
-	totalTime = 0.0f;
-	//createFramebuffer();
-/*
-	//Model 1 (Armored Vehicle)
-	string modelPath = ASSET_PATH + MODEL_PATH + "/Art_Gallery1.fbx";
-	auto currentGameObject = loadFBXFromFile(modelPath);
-
-	//Specular Lighting Shaders
-	string vsPath = ASSET_PATH + SHADER_PATH + "/specularVS.glsl";
-	string fsPath = ASSET_PATH + SHADER_PATH + "/specularFS.glsl";
-
-	string vsPath = ASSET_PATH + SHADER_PATH + "/textureVS.glsl";
-	string fsPath = ASSET_PATH + SHADER_PATH + "/textureFS.glsl";
-
-	currentGameObject->loadShader(vsPath, fsPath);
-
-	string texturePath = ASSET_PATH + TEXTURE_PATH + "/armoredrecon_diff.png";
-	currentGameObject->loadDiffuseMap(texturePath);
-
-	gameObjects.push_back(currentGameObject);
-	currentGameObject->setPosition(vec3(0.0f, -10.0f, 0.0f));
-*/
-
-	////Model 2 (Tank)
-	//modelPath = ASSET_PATH + MODEL_PATH + "/Tank1.fbx";
-	//currentGameObject = loadFBXFromFile(modelPath);
-	//vsPath = ASSET_PATH + SHADER_PATH + "/textureVS.glsl";
-	//fsPath = ASSET_PATH + SHADER_PATH + "/textureFS.glsl";
-	//currentGameObject->loadShader(vsPath, fsPath);
-
-	//texturePath = ASSET_PATH + TEXTURE_PATH + "/Tank1DF.png";
-	//currentGameObject->loadDiffuseMap(texturePath);
-
-	//gameObjects.push_back(currentGameObject);
-
-	////Model 2(Sofa)
-	//modelPath = ASSET_PATH + MODEL_PATH + "/Basic_House.fbx";
-	//currentGameObject = loadFBXFromFile(modelPath);
-	//vsPath = ASSET_PATH + SHADER_PATH + "/specularVS.glsl";
-	//fsPath = ASSET_PATH + SHADER_PATH + "/specularFS.glsl";
-	//currentGameObject->loadShader(vsPath, fsPath);
-
-	//gameObjects.push_back(currentGameObject);
-	//currentGameObject->setPosition(vec3(50.0f, 10.0f, 0.0f));
-}
-
-void cleanUpFramebuffer()
-{
-	glDeleteProgram(fullScreenShaderProgram);
-	glDeleteBuffers(1, &fullScreenVBO);
-	glDeleteVertexArrays(1, &fullScreenVAO);
-	glDeleteFramebuffers(1, &frameBufferObject);
-	glDeleteRenderbuffers(1, &FBODepthBuffer);
-	glDeleteTextures(1, &FBOTexture);
-}
-
-void cleanUp()
-{
-	cleanUpFramebuffer();
-	currentScene->gameObjects.clear();
-	currentScene = NULL;
-}
-
-
-void update()
-{
-	lastTicks = currentTicks;
-	currentTicks = SDL_GetTicks();
-	elapsedTime = (currentTicks - lastTicks) / 1000.0f;
-	totalTime += elapsedTime;
-
-	projMatrix = perspective(45.0f, 640.0f / 480.0f, 0.1f, 100.0f);
-
-	viewMatrix = lookAt(cameraPosition, vec3(0.0f, 0.0f, 0.0f), vec3(0.0f, 1.0f, 0.0f));
-
-	for (auto iter = currentScene->gameObjects.begin(); iter != currentScene->gameObjects.end(); iter++)
-	{
-		(*iter)->update();
-	}
-}
-
-void renderGameObject(shared_ptr<GameObject> gameObject)
-{
-	MVPMatrix = projMatrix*viewMatrix*gameObject->getModelMatrix();
-
-	if (gameObject->getShaderProgram() > 0){
-		currentShaderProgam = gameObject->getShaderProgram();
-		glUseProgram(currentShaderProgam);
-	}
-
-	GLint MVPLocation = glGetUniformLocation(currentShaderProgam, "MVP");
-
-	GLint ambientLightColourLocation = glGetUniformLocation(currentShaderProgam, "ambientLightColour");
-	GLint ambientMaterialColourLocation = glGetUniformLocation(currentShaderProgam, "ambientMaterialColour");
-
-	GLint diffuseLightColourLocation = glGetUniformLocation(currentShaderProgam, "diffuseLightColour");
-	GLint diffuseLightMaterialLocation = glGetUniformLocation(currentShaderProgam, "diffuseMaterialColour");
-	GLint lightDirectionLocation = glGetUniformLocation(currentShaderProgam, "lightDirection");
-
-	GLint specularLightColourLocation = glGetUniformLocation(currentShaderProgam, "specularLightColour");
-	GLint specularLightMaterialLocation = glGetUniformLocation(currentShaderProgam, "specularMaterialColour");
-	GLint specularPowerLocation = glGetUniformLocation(currentShaderProgam, "specularPower");
-	GLint cameraPositionLocation = glGetUniformLocation(currentShaderProgam, "cameraPosition");
-
-	GLint modelLocation = glGetUniformLocation(currentShaderProgam, "Model");
-
-	GLint texture0Location = glGetUniformLocation(currentShaderProgam, "texture0");
-
-	if (gameObject->getDiffuseMap() > 0){
-		currentDiffuseMap = gameObject->getDiffuseMap();
-	}
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, currentDiffuseMap);
-	glUniform1i(texture0Location, 0);
-
-	glUniformMatrix4fv(MVPLocation, 1, GL_FALSE, value_ptr(MVPMatrix));
-	glUniformMatrix4fv(modelLocation, 1, GL_FALSE, value_ptr(gameObject->getModelMatrix()));
-
-	glUniform4fv(ambientLightColourLocation, 1, value_ptr(ambientLightColour));
-	glUniform4fv(ambientMaterialColourLocation, 1, value_ptr(gameObject->getAmbientMaterial()));
-
-	glUniform4fv(diffuseLightColourLocation, 1, value_ptr(diffuseLightColour));
-	glUniform4fv(diffuseLightMaterialLocation, 1, value_ptr(gameObject->getDiffuseMaterial()));
-	glUniform3fv(lightDirectionLocation, 1, value_ptr(lightDirection));
-
-	glUniform4fv(specularLightColourLocation, 1, value_ptr(specularLightColour));
-	glUniform4fv(specularLightMaterialLocation, 1, value_ptr(gameObject->getSpecularMaterial()));
-	glUniform1f(specularPowerLocation, gameObject->getSpecularPower());
-	glUniform3fv(cameraPositionLocation, 1, value_ptr(cameraPosition));
-
-
-	glBindVertexArray(gameObject->getVertexArrayObject());
-	if (gameObject->getVertexArrayObject()>0)
-		glDrawElements(GL_TRIANGLES, gameObject->getNumberOfIndices(), GL_UNSIGNED_INT, 0);
-
-	for (int i = 0; i < gameObject->getNumberOfChildren(); i++)
-	{
-		renderGameObject(gameObject->getChild(i));
-	}
-}
-
-void renderScene()
-{
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-	//Set the clear colour(background)
-	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-	//clear the colour and depth buffer
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-	for (auto iter = currentScene->gameObjects.begin(); iter != currentScene->gameObjects.end(); iter++)
-	{
-		renderGameObject((*iter));
-	}
-}
-
-void renderPostQuad()
-{
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-	//Set the clear colour(background)
-	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-	//clear the colour and depth buffer
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-	glUseProgram(fullScreenShaderProgram);
-
-	GLint textureLocation = glGetUniformLocation(fullScreenShaderProgram, "texture0");
-	GLint timeLocation = glGetUniformLocation(fullScreenShaderProgram, "time");
-	GLint resolutionLocation = glGetUniformLocation(fullScreenShaderProgram, "resolution");
-
-	glUniform1f(timeLocation, totalTime);
-	glUniform2fv(resolutionLocation, 1, value_ptr(screenResolution));
-
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, FBOTexture);
-	glUniform1i(textureLocation, 0);
-
-	glBindVertexArray(fullScreenVAO);
-
-	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-
-}
-
-void render()
-{
-	renderScene();
-	//renderPostQuad();
-}
-
-void CoreInitialise()
-{
-	ChangeWorkingDirectory();
+	Core::width = width;
+	Core::height = height;
+	
+	//Change working directory
+#ifdef _WIN32
+	char buffer[MAX_PATH];
+	GetModuleFileName(NULL, buffer, MAX_PATH);
+	//move into a string(just makes it easier
+	string exeFullFilename(buffer);
+	cout << "Exe Path & Filename " << exeFullFilename << endl;
+	//now stripout the exe
+	string exeDirectory = exeFullFilename.substr(0, exeFullFilename.find_last_of("\\"));
+	cout << "Exe Directory " << exeDirectory << endl;
+	SetCurrentDirectory(exeDirectory.c_str());
+#endif
 
 	// init everyting - SDL, if it is nonzero we have a problem
 	if (SDL_Init(SDL_INIT_EVERYTHING) != 0)
@@ -361,14 +55,23 @@ void CoreInitialise()
 	glcontext = SDL_GL_CreateContext(window);
 
 	//Call our InitOpenGL Function
-	initOpenGL();
+	InitOpenGL();
 	//Set our viewport
-	setViewport(640, 480);
-
-	initScene();
+	glViewport(0, 0, (GLsizei)width, (GLsizei)height);
 }
 
-void CoreMainLoop()
+Core::~Core()
+{
+	// clean up, reverse order!!!
+	CleanUp();
+	SDL_GL_DeleteContext(glcontext);
+	SDL_DestroyWindow(window);
+	IMG_Quit();
+	TTF_Quit();
+	SDL_Quit();
+}
+
+void Core::StartMainLoop()
 {
 	//Value to hold the event generated by SDL
 	SDL_Event event;
@@ -376,38 +79,13 @@ void CoreMainLoop()
 	bool run = true; while (run)
 	{
 		//While we still have events in the queue
-		while (SDL_PollEvent(&event)) {
+		while (SDL_PollEvent(&event))
+		{
 			//Get event type
-			if (event.type == SDL_QUIT || event.type == SDL_WINDOWEVENT_CLOSE) {
+			if (event.type == SDL_QUIT || event.type == SDL_WINDOWEVENT_CLOSE)
+			{
 				//set our boolean which controls the loop to false
 				run = false;
-			}
-			if (event.type == SDL_KEYDOWN){
-				switch (event.key.keysym.sym)
-				{
-				case SDLK_LEFT:
-					cameraPosition.x -= 2.0f;
-					break;
-				case SDLK_RIGHT:
-					cameraPosition.x += 2.0f;
-					break;
-				case SDLK_UP:
-					cameraPosition.y -= 2.0f;
-					break;
-				case SDLK_DOWN:
-					cameraPosition.y += 2.0f;
-					break;
-
-				case SDLK_q:
-					cameraPosition.z -= 2.0f;
-					break;
-
-				case SDLK_e:
-					cameraPosition.z += 2.0f;
-					break;
-				default:
-					break;
-				}
 			}
 
 			if (event.type == SDL_MOUSEMOTION)
@@ -416,19 +94,89 @@ void CoreMainLoop()
 			}
 		}
 		//init Scene
-		update();
+		Update();
 		//render
-		render();
+		Render();
 		//Call swap so that our GL back buffer is displayed
 		SDL_GL_SwapWindow(window);
+	}
+}
 
+void Core::Update()
+{
+
+}
+
+void Core::Render()
+{
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	//Set the clear colour(background)
+	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+	//clear the colour and depth buffer
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+
+}
+
+void Core::CleanUp()
+{
+	glDeleteProgram(fullScreenShaderProgram);
+	glDeleteBuffers(1, &fullScreenVBO);
+	glDeleteVertexArrays(1, &fullScreenVAO);
+	glDeleteFramebuffers(1, &frameBufferObject);
+	glDeleteRenderbuffers(1, &FBODepthBuffer);
+	glDeleteTextures(1, &FBOTexture);
+	
+}
+
+void Core::InitOpenGL()
+{
+	glewExperimental = GL_TRUE;
+	GLenum err = glewInit();
+	if (GLEW_OK != err)
+	{
+		//Problem: glewInit failed, something is seriously wrong.
+		std::cout << "Error: " << glewGetErrorString(err) << std::endl;
 	}
 
-	// clean up, reverse order!!!
-	cleanUp();
-	SDL_GL_DeleteContext(glcontext);
-	SDL_DestroyWindow(window);
-	IMG_Quit();
-	TTF_Quit();
-	SDL_Quit();
+	std::cout << GetRendererCapsAsString() << endl;
+
+	//Smooth shading
+	glShadeModel(GL_SMOOTH);
+
+	//clear the background to black
+	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+
+	//Clear the depth buffer
+	glClearDepth(1.0f);
+
+	//Enable depth testing
+	glEnable(GL_DEPTH_TEST);
+
+	//The depth test to go
+	glDepthFunc(GL_LEQUAL);
+
+	//Turn on best perspective correction
+	glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
+}
+
+string Core::GetRendererCapsAsString()
+{
+	stringstream stringStream;
+
+	stringStream << "OpenGl Version: " << glGetString(GL_VERSION) << "\n";
+	stringStream << "Vendor: " << glGetString(GL_VENDOR) << "\n";
+	stringStream << "Renderer: " << glGetString(GL_RENDERER) << "\n";
+	stringStream << "Shading: " << glGetString(GL_SHADING_LANGUAGE_VERSION) << "\n";
+	stringStream << "Extensions Supported\n";
+	GLint n = 0;
+	glGetIntegerv(GL_NUM_EXTENSIONS, &n);
+	for (GLint i = 0; i<n; i++)
+	{
+		const char* extension =
+			(const char*)glGetStringi(GL_EXTENSIONS, i);
+		stringStream << extension << ", ";
+	}
+
+	return stringStream.str();
 }

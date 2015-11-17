@@ -19,7 +19,7 @@ FIND_PACKAGE(FBX REQUIRED)
 
 #Core library
 FILE(GLOB Core_SRC Core/src/*.cpp Core/include/*.h)
-add_library(Core DEBUG ${Core_SRC})
+add_library(Core ${Core_SRC})
 SET_TARGET_PROPERTIES(Core PROPERTIES LINKER_LANGUAGE CXX)
 
 #source files

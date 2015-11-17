@@ -1,124 +1,141 @@
-#ifndef _GAMEOBJECT_H
-#define _GAMEOBJECT_H
+#include "GameObject.h"
+#include "Shader.h"
+#include "Texture.h"
 
-#include "Common.h"
-#include "Vertices.h"
-
-class GameObject
+GameObject::GameObject()
 {
-public:
-	GameObject();
-	~GameObject();
+	m_VBO = 0;
+	m_EBO = 0;
+	m_VAO = 0;
+	m_NoOfIndices = 0;
+	m_NoOfVertices = 0;
 
-	void update();
+	m_ShaderProgram = 0;
 
-	void addChild(shared_ptr<GameObject> child);
+	m_ModelMatrix = mat4(1.0f);
+	m_Position = vec3(0.0f);
+	m_Rotation = vec3(0.0f);
+	m_Scale = vec3(1.0f);
 
-	void createBuffers(Vertex * pVerts, int numVerts, int *pIndices, int numIndices);
-	void loadShader(const string& vsFilename, const string& fsFilename);
-	void loadDiffuseMap(const string& filename);
+	m_AmbientMaterial = vec4(0.3f, 0.3f, 0.3f, 1.0f);
+	m_DiffuseMaterial = vec4(0.8f, 0.8f, 0.8f, 1.0f);
+	m_SpecularMaterial = vec4(1.0f, 1.0f, 1.0f, 1.0f);
+	m_SpecularPower = 25.0f;
 
-	void setPosition(const vec3& position)
+	m_ChildGameObjects.clear();
+
+	m_ParentGameObject = NULL;
+	m_DiffuseMap = 0;
+}
+
+GameObject::~GameObject()
+{
+	glDeleteBuffers(1, &m_VBO);
+	glDeleteBuffers(1, &m_EBO);
+	glDeleteVertexArrays(1, &m_VAO);
+	glDeleteProgram(m_ShaderProgram);
+	glDeleteTextures(1, &m_DiffuseMap);
+	m_ChildGameObjects.clear();
+}
+
+void GameObject::update()
+{
+	mat4 parentModel(1.0f);
+	if (m_ParentGameObject)
 	{
-		m_Position = position;
-	};
+		parentModel = m_ParentGameObject->getModelMatrix();
+	}
+	mat4 translationMatrix = translate(mat4(1.0f), m_Position);
+	mat4 scaleMatrix = scale(mat4(1.0f), m_Scale);
 
-	void setRotation(const vec3& rotation)
+	mat4 rotationMatrix = rotate(mat4(1.0f), m_Rotation.x, vec3(1.0f, 0.0f, 0.0f))*
+		rotate(mat4(1.0f), m_Rotation.y, vec3(0.0f, 1.0f, 0.0f))*
+		rotate(mat4(1.0f), m_Rotation.z, vec3(0.0f, 0.0f, 1.0f));
+
+	m_ModelMatrix = scaleMatrix*rotationMatrix*translationMatrix;
+	m_ModelMatrix *= parentModel;
+
+	for (auto iter = m_ChildGameObjects.begin(); iter != m_ChildGameObjects.end(); iter++)
 	{
-		m_Rotation = rotation;
-	};
+		(*iter)->update();
+	}
+}
 
-	void setScale(const vec3& scale)
-	{
-		m_Scale = scale;
-	};
+void GameObject::addChild(shared_ptr<GameObject> child)
+{
+	child->m_ParentGameObject = this;
+	m_ChildGameObjects.push_back(child);
+}
 
-	int getNumberOfChildren()
-	{
-		return m_ChildGameObjects.size();
-	};
+void GameObject::createBuffers(Vertex * pVerts, int numVerts, int *pIndices, int numIndices)
+{
+	m_NoOfIndices = numIndices;
+	m_NoOfVertices = numVerts;
 
-	GameObject * getParent()
-	{
-		return m_ParentGameObject;
-	};
+	//Generate Vertex Array
+	glGenVertexArrays(1, &m_VAO);
+	glBindVertexArray(m_VAO);
 
-	shared_ptr<GameObject> getChild(int i)
-	{
-		return m_ChildGameObjects.at(i);
-	};
+	glGenBuffers(1, &m_VBO);
+	glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
 
-	GLuint getVertexArrayObject()
-	{
-		return m_VAO;
-	};
+	glBufferData(GL_ARRAY_BUFFER, numVerts*sizeof(Vertex), pVerts, GL_STATIC_DRAW);
 
-	GLuint getShaderProgram()
-	{
-		return m_ShaderProgram;
-	};
+	//create buffer
+	glGenBuffers(1, &m_EBO);
+	//Make the EBO active
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_EBO);
+	//Copy Index data to the EBO
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, numIndices*sizeof(int), pIndices, GL_STATIC_DRAW);
 
-	mat4& getModelMatrix()
-	{
-		return m_ModelMatrix;
-	};
+	//Tell the shader that 0 is the position element
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, position));
 
-	vec4& getAmbientMaterial()
-	{
-		return m_AmbientMaterial;
-	};
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, colour));
 
-	vec4& getDiffuseMaterial()
-	{
-		return m_DiffuseMaterial;
-	};
+	glEnableVertexAttribArray(2);
+	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, texCoords));
 
-	vec4& getSpecularMaterial()
-	{
-		return m_SpecularMaterial;
-	};
+	glEnableVertexAttribArray(3);
+	glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, normal));
+}
 
-	float getSpecularPower()
-	{
-		return m_SpecularPower;
-	};
+void GameObject::loadShader(const string& vsFilename, const string& fsFilename)
+{
+	GLuint vertexShaderProgram = 0;
+	vertexShaderProgram = loadShaderFromFile(vsFilename, VERTEX_SHADER);
+	checkForCompilerErrors(vertexShaderProgram);
 
-	int getNumberOfIndices()
-	{
-		return m_NoOfIndices;
-	};
+	GLuint fragmentShaderProgram = 0;
+	fragmentShaderProgram = loadShaderFromFile(fsFilename, FRAGMENT_SHADER);
+	checkForCompilerErrors(fragmentShaderProgram);
 
-	int getNumberOfVetices()
-	{
-		return m_NoOfVertices;
-	};
+	m_ShaderProgram = glCreateProgram();
+	glAttachShader(m_ShaderProgram, vertexShaderProgram);
+	glAttachShader(m_ShaderProgram, fragmentShaderProgram);
 
-	GLuint getDiffuseMap()
-	{
-		return m_DiffuseMap;
-	};
-private:
-	GLuint m_VBO;
-	GLuint m_EBO;
-	GLuint m_VAO;
-	GLuint m_ShaderProgram;
-	int m_NoOfIndices;
-	int m_NoOfVertices;
+	//Link attributes
+	glBindAttribLocation(m_ShaderProgram, 0, "vertexPosition");
+	glBindAttribLocation(m_ShaderProgram, 1, "vertexColour");
+	glBindAttribLocation(m_ShaderProgram, 2, "vertexTexCoords");
+	glBindAttribLocation(m_ShaderProgram, 3, "vertexNormal");
 
-	mat4 m_ModelMatrix;
-	vec3 m_Position;
-	vec3 m_Rotation;
-	vec3 m_Scale;
+	glLinkProgram(m_ShaderProgram);
+	checkForLinkErrors(m_ShaderProgram);
+	//now we can delete the VS & FS Programs
+	glDeleteShader(vertexShaderProgram);
+	glDeleteShader(fragmentShaderProgram);
+}
 
-	vec4 m_AmbientMaterial;
-	vec4 m_DiffuseMaterial;
-	vec4 m_SpecularMaterial;
-	float m_SpecularPower;
+void GameObject::loadDiffuseMap(const string& filename)
+{
+	m_DiffuseMap = loadTextureFromFile(filename);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glGenerateMipmap(GL_TEXTURE_2D);
+}
 
-	GLuint m_DiffuseMap;
-
-	vector<shared_ptr<GameObject> > m_ChildGameObjects;
-	GameObject * m_ParentGameObject;
-};
-
-#endif
