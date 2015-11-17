@@ -4,6 +4,7 @@
 #include "Common.h"
 #include "Texture.h"
 #include "Mesh.h"
+#include "GameObject.h"
 
 class Core
 {

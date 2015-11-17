@@ -43,7 +43,7 @@ void GameObject::update()
 	mat4 parentModel(1.0f);
 	if (m_ParentGameObject)
 	{
-		parentModel = m_ParentGameObject->getModelMatrix();
+		parentModel = m_ParentGameObject->GetModelMatrix();
 	}
 	mat4 translationMatrix = translate(mat4(1.0f), m_Position);
 	mat4 scaleMatrix = scale(mat4(1.0f), m_Scale);
@@ -61,13 +61,13 @@ void GameObject::update()
 	}
 }
 
-void GameObject::addChild(shared_ptr<GameObject> child)
+void GameObject::AddChild(shared_ptr<GameObject> child)
 {
 	child->m_ParentGameObject = this;
 	m_ChildGameObjects.push_back(child);
 }
 
-void GameObject::createBuffers(Vertex * pVerts, int numVerts, int *pIndices, int numIndices)
+void GameObject::CreateBuffers(Vertex * pVerts, int numVerts, int *pIndices, int numIndices)
 {
 	m_NoOfIndices = numIndices;
 	m_NoOfVertices = numVerts;
@@ -102,7 +102,7 @@ void GameObject::createBuffers(Vertex * pVerts, int numVerts, int *pIndices, int
 	glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, normal));
 }
 
-void GameObject::loadShader(const string& vsFilename, const string& fsFilename)
+void GameObject::LoadShader(const string& vsFilename, const string& fsFilename)
 {
 	GLuint vertexShaderProgram = 0;
 	vertexShaderProgram = loadShaderFromFile(vsFilename, VERTEX_SHADER);
@@ -129,7 +129,7 @@ void GameObject::loadShader(const string& vsFilename, const string& fsFilename)
 	glDeleteShader(fragmentShaderProgram);
 }
 
-void GameObject::loadDiffuseMap(const string& filename)
+void GameObject::LoadDiffuseMap(const string& filename)
 {
 	m_DiffuseMap = loadTextureFromFile(filename);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);

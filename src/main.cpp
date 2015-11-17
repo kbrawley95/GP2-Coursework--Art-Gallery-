@@ -19,7 +19,7 @@ int main()
 
 	//Model 1 (Armored Vehicle)
 	string modelPath = ASSET_PATH + MODEL_PATH + "/Art_Gallery1.fbx";
-	auto currentGameObject = loadFBXFromFile(modelPath);
+	auto currentGameObject = LoadFBXFromFile(modelPath);
 
 	currentGameObject->loadShader(ASSET_PATH + SHADER_PATH + "/specularVS.glsl", ASSET_PATH + SHADER_PATH + "/specularFS.glsl");
 
