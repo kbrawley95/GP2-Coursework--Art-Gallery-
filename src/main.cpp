@@ -24,7 +24,6 @@ int main()
 	currentGameObject->loadShader(ASSET_PATH + SHADER_PATH + "/specularVS.glsl", ASSET_PATH + SHADER_PATH + "/specularFS.glsl");
 
 	level->gameObjects.push_back(currentGameObject);
-	currentGameObject->setPosition(vec3(0.0f, -10.0f, 0.0f));
 
 	CoreMainLoop();
 
