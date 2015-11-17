@@ -9,12 +9,15 @@ public:
 	Scene();
 	~Scene();
 
-	list<GameObject*> gameObjects;
-	list<GameObject*>::iterator iter;
+	GameObject* FindGameObject(string name);
+	void AddGameObject(GameObject* g);
+	void RemoveGameObject(GameObject* g);
+
+	
 
 private:
-
-
+	list<GameObject*> gameObjects;
+	list<GameObject*>::iterator iter;
 };
 
 #endif

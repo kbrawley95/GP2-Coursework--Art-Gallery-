@@ -8,6 +8,8 @@ class GameObject
 {
 public:
 
+	string name;
+
 	GameObject();
 	~GameObject();
 
