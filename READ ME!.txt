@@ -1,0 +1,17 @@
+PROJECT SETUP
+Right click My Computer/This PC then click properties.
+On the left hand side click advance system settings.
+Now in advanced tab click environment variables.
+Create a new varible called "CMAKE_PREFIX_PATH".
+Set its value to where your libraries are located.
+
+NOTE: your folders must be layed out like so
+
+		 |--bin
+Libraries|--include
+		 |--lib
+
+Put all of the include folders/files, lib files and dll files in the apropriate folder.
+
+Finally restart Cmake and delete your cache.
+Now your cmake should find all dependencies on its own.
