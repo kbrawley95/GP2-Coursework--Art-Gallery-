@@ -1,27 +1,34 @@
 #ifndef _COMPONENT_H
 #define _COMPONENT_H
 
-#include "Common.h"
-#include "GameObject.h"
+class GameObject;
 
 class Component
 {
 public:
+	GameObject* gameObject;
 
-	Component() :m_OwnerGameObj(0){}
-	~Component();
+	Component()
+	{
 
-	typedef string gameObjID;
+	}
+	~Component()
+	{
 
-	virtual void Update();
+	}
 
-	GameObject* GetOwner()const { return m_OwnerGameObj; }
+	virtual void Update()
+	{
 
-private:
+	}
+	virtual void Render()
+	{
 
-	GameObject* m_OwnerGameObj;
-	
+	}
+	virtual void Start()
+	{
+
+	}
 };
 
 #endif
-

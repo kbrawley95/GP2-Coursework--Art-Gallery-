@@ -1,29 +1,12 @@
 #include "Scene.h"
 
-Scene::Scene()
+Scene::Scene(Camera* camera)
 {
-
+	Scene::camera = new GameObject();
+	Scene::camera->components.push_back(camera);
 }
 
 Scene::~Scene()
 {
 
-
-}
-
-GameObject* Scene::FindGameObject(string objName)
-{
-	for (iter = gameObjects.begin(); iter != gameObjects.end(); iter++)
-	{
-		if ((*iter)->name == objName)
-			return (*iter);
-	}
-}
-void Scene::AddGameObject(GameObject* g)
-{
-	gameObjects.push_back(g);
-}
-void Scene::RemoveGameObject(GameObject* g)
-{
-	gameObjects.remove(g);
 }

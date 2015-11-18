@@ -1,24 +1,19 @@
 #ifndef _SCENE_H
 #define _SCENE_H
 
+#include "Common.h"
 #include "GameObject.h"
+#include "Camera.h"
 
 class Scene
 {
 public:
-	Scene();
+	string name;
+	GameObject* camera;
+	vector<GameObject*> gameObjects;
+
+	Scene(Camera* camera);
 	~Scene();
-
-	GameObject* FindGameObject(string name);
-	void AddGameObject(GameObject* g);
-	void RemoveGameObject(GameObject* g);
-
-	
-
-private:
-	list<GameObject*> gameObjects;
-	list<GameObject*>::iterator iter;
 };
 
 #endif
-

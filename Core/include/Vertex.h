@@ -1,5 +1,5 @@
-#ifndef _VERTICES_H
-#define _VERTICES_H
+#ifndef _VERTEX_H
+#define _VERTEX_H
 
 #include "Common.h"
 

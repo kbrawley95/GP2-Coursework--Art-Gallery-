@@ -2,33 +2,28 @@
 #define _CORE_H
 
 #include "Common.h"
-#include "Texture.h"
+#include "Scene.h"
 #include "Mesh.h"
-#include "GameObject.h"
 
 class Core
 {
 public:
 	int width = 800;
 	int height = 600;
+	Scene* scene;
 
 	Core(int width, int height);
 	~Core();
 
-	void StartMainLoop();
+	void Start();
 
 private:
 	SDL_Window* window;
-	SDL_GLContext glcontext;
+	SDL_GLContext glContext;
 
-	void Update();
 	void Render();
-	void CleanUp();
-	void InitOpenGL();
-	string GetRendererCapsAsString();
+	void Update();
+	void Input(SDL_Event* e);
 };
-
-void CoreInitialise();
-void CoreMainLoop();
 
 #endif

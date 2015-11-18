@@ -1,31 +1,24 @@
-#include "Common.h"
-#include "Graphics.h"
-#include "Vertices.h"
-#include "Shader.h"
-#include "Texture.h"
-#include "Mesh.h"
-#include "FBXLoader.h"
-#include "FileSystem.h"
 #include "Core.h"
-#include "Scene.h"
 
 #define SDL_main main
 
-int main()
+int main(int argc, char *argv[])
 {
-	CoreInitialise();
-	//Create scene/level
-	Scene* level = new Scene();
+	//Start Engine
+	Core engine = Core(800, 600);
 
-	//Model 1 (Armored Vehicle)
-	string modelPath = ASSET_PATH + MODEL_PATH + "/Art_Gallery1.fbx";
-	auto currentGameObject = LoadFBXFromFile(modelPath);
+	//Create New Scene & Setup Camera
+	Scene* artGalary = new Scene(new Camera(90, 1, 0.1f, 1000));
+	engine.scene = artGalary;
 
-	currentGameObject->loadShader(ASSET_PATH + SHADER_PATH + "/specularVS.glsl", ASSET_PATH + SHADER_PATH + "/specularFS.glsl");
+	//Create New Object
+	GameObject* artGalaryModel = new GameObject();
+	//Add a mesh component to store the mesh
+	artGalaryModel->components.push_back(new Mesh(MODEL_PATH + "/Art Gallery.fbx"));
+	//Add a mesh renderer component to render stored mesh
 
-	level->gameObjects.push_back(currentGameObject);
 
-	CoreMainLoop();
+	engine.Start();
 
 	return 0;
 }
