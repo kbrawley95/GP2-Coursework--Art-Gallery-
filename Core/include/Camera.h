@@ -11,6 +11,7 @@ public:
 	void Update();
 	void Render();
 	mat4 GetLookAt();
+
 	vec3 GetLightDirection()
 	{
 		return lightDirection;

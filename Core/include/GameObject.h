@@ -4,6 +4,7 @@
 #include "Common.h"
 #include "Transform.h"
 #include "Component.h"
+#include "Shader.h"
 
 class GameObject
 {
@@ -30,7 +31,8 @@ public:
 
 	mat4 GetModelMatrix();
 	
-	void LoadShader();
+
+	void LoadShader(const string& vsFilename, const string& fsFilename, Shader* shader);
 
 	GLuint GetVertexArrayObject()
 	{
@@ -92,7 +94,6 @@ private:
 	int m_NoOfIndices;
 	int m_NoOfVertices;
 
-	mat4 m_ModelMatrix;
 	vec3 m_Position;
 	vec3 m_Rotation;
 	vec3 m_Scale;

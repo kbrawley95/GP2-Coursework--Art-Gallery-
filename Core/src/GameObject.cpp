@@ -27,15 +27,15 @@ mat4 GameObject::GetModelMatrix()
 	return m_ModelMatrix;
 }
 
-void GameObject::LoadShader()
+void GameObject::LoadShader(const string& vsFilename, const string& fsFilename,Shader* shader)
 {
 	GLuint vertexShaderProgram = 0;
-	vertexShaderProgram = loadShaderFromFile(vsFilename, VERTEX_SHADER);
-	checkForCompilerErrors(vertexShaderProgram);
+	vertexShaderProgram = shader->LoadShaderFromFile(vsFilename, shader->VERTEX_SHADER);
+	shader->CheckForCompilerErrors(vertexShaderProgram);
 
 	GLuint fragmentShaderProgram = 0;
-	fragmentShaderProgram = loadShaderFromFile(fsFilename, FRAGMENT_SHADER);
-	checkForCompilerErrors(fragmentShaderProgram);
+	fragmentShaderProgram = shader->LoadShaderFromFile(fsFilename, shader->FRAGMENT_SHADER);
+	shader->CheckForCompilerErrors(fragmentShaderProgram);
 
 	m_ShaderProgram = glCreateProgram();
 	glAttachShader(m_ShaderProgram, vertexShaderProgram);
@@ -48,7 +48,7 @@ void GameObject::LoadShader()
 	glBindAttribLocation(m_ShaderProgram, 3, "vertexNormal");
 
 	glLinkProgram(m_ShaderProgram);
-	checkForLinkErrors(m_ShaderProgram);
+	shader->CheckForLinkErrors(m_ShaderProgram);
 	//now we can delete the VS & FS Programs
 	glDeleteShader(vertexShaderProgram);
 	glDeleteShader(fragmentShaderProgram);
