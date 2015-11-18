@@ -8,15 +8,15 @@ int main(int argc, char *argv[])
 	Core engine = Core(800, 600);
 
 	//Create New Scene & Setup Camera
-	Scene* artGalary = new Scene(new Camera(90, 1, 0.1f, 1000));
-	engine.scene = artGalary;
+	Scene* artGallery = new Scene(new Camera(90, 1, 0.1f, 1000));
+	engine.scene = artGallery;
 
 	//Create New Object
-	GameObject* artGalaryModel = new GameObject();
+	GameObject* artGalleryModel = new GameObject();
 	//Add a mesh component to store the mesh
-	artGalaryModel->components.push_back(new Mesh(MODEL_PATH + "/Art Gallery.fbx"));
+	artGalleryModel->components.push_back(new Mesh(MODEL_PATH + "/Art Gallery.fbx"));
 	//Add a mesh renderer component to render stored mesh
-
+	artGalleryModel->components.push_back(new MeshRenderer());
 
 	engine.Start();
 

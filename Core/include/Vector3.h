@@ -18,6 +18,11 @@ struct Vector3
 	{
 		return{ a.x, a.y, a.z };
 	}
+
+	vec3 ConvertToVec3()
+	{
+		return vec3(x,y,z);
+	}
 };
 
 #endif

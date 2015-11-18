@@ -11,6 +11,10 @@ public:
 	void Update();
 	void Render();
 	mat4 GetLookAt();
+	vec3 GetLightDirection()
+	{
+		return lightDirection;
+	}
 
 	Camera(float fov, float aspect, float zNear, float zFar);
 	~Camera();
@@ -23,6 +27,8 @@ private:
 	vec3 m_pos;
 	vec3 m_rot;
 	vec3 m_scale;
+
+	vec3 lightDirection = vec3(0.0f, 0.0f, 1.0f);
 };
 
 #endif

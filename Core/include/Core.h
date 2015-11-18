@@ -4,6 +4,7 @@
 #include "Common.h"
 #include "Scene.h"
 #include "Mesh.h"
+#include "MeshRenderer.h"
 
 class Core
 {

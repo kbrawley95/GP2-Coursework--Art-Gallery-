@@ -28,8 +28,82 @@ public:
 		return NULL;
 	}
 
+	mat4 GetModelMatrix();
+	
+	void LoadShader();
+
+	GLuint GetVertexArrayObject()
+	{
+		return m_VAO;
+	};
+
+	GLuint GetShaderProgram()
+	{
+		return m_ShaderProgram;
+	};
+
+	vec4& GetAmbientMaterial()
+	{
+		return m_AmbientMaterial;
+	};
+
+	vec4& GetDiffuseMaterial()
+	{
+		return m_DiffuseMaterial;
+	};
+
+	vec4& GetSpecularMaterial()
+	{
+		return m_SpecularMaterial;
+	};
+
+	float GetSpecularPower()
+	{
+		return m_SpecularPower;
+	};
+
+	int GetNumberOfIndices()
+	{
+		return m_NoOfIndices;
+	};
+
+	int GetNumberOfVetices()
+	{
+		return m_NoOfVertices;
+	};
+
+	GLuint GetDiffuseMap()
+	{
+		return m_DiffuseMap;
+	};
+
+
 	GameObject();
 	~GameObject();
+
+private:
+
+	mat4 m_ModelMatrix;
+
+	GLuint m_VBO;
+	GLuint m_EBO;
+	GLuint m_VAO;
+	GLuint m_ShaderProgram;
+	int m_NoOfIndices;
+	int m_NoOfVertices;
+
+	mat4 m_ModelMatrix;
+	vec3 m_Position;
+	vec3 m_Rotation;
+	vec3 m_Scale;
+
+	vec4 m_AmbientMaterial;
+	vec4 m_DiffuseMaterial;
+	vec4 m_SpecularMaterial;
+	float m_SpecularPower;
+
+	GLuint m_DiffuseMap;
+	
 };
 
 #endif
