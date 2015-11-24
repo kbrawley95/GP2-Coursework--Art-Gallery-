@@ -7,6 +7,10 @@
 class Material : public Component
 {
 public:
+
+	shared_ptr<Shader> vs;
+	shared_ptr<Shader> fs;
+
 	vec4& GetAmbientMaterial()
 	{
 		return m_AmbientMaterial;
@@ -28,9 +32,11 @@ public:
 		//Compile Shader
 	}
 
-	Material(shared_ptr<Shader> shader)
+	Material(shared_ptr<Shader> vs, shared_ptr<Shader> fs)
 	{
 		//Compile Shader
+		Material::vs = vs;
+		Material::fs = fs;
 	}
 
 	//Memory cleanup

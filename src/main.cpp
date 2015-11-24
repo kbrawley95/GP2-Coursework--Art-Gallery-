@@ -20,5 +20,13 @@ int main(int argc, char *argv[])
 
 	engine.Start();
 
+
+	shared_ptr<Shader> vs = shared_ptr<Shader>(new Shader(SHADER_PATH + "/shit.vs", Shader::SHADER_TYPE::VERTEX_SHADER));
+	shared_ptr<Shader> fs = shared_ptr<Shader>(new Shader(SHADER_PATH + "/shit.fs", Shader::SHADER_TYPE::FRAGMENT_SHADER));
+	shared_ptr<Material> blue = shared_ptr<Material>(new Material(vs, fs));
+	shared_ptr<MeshRenderer> mesh = shared_ptr<MeshRenderer>(new MeshRenderer(blue));
+
+
+
 	return 0;
 }

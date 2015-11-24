@@ -7,12 +7,17 @@
 class Shader : public Component
 {
 public:
-
 	enum SHADER_TYPE
 	{
 		VERTEX_SHADER = GL_VERTEX_SHADER,
 		FRAGMENT_SHADER = GL_FRAGMENT_SHADER
 	};
+
+	GLuint currentShaderProgram = 0;
+	SHADER_TYPE type;
+
+	Shader(const std::string& filename, SHADER_TYPE shaderType);
+	~Shader();	
 
 	GLuint LoadShaderFromMemory(const char * pMem, SHADER_TYPE shaderType);
 
@@ -21,9 +26,6 @@ public:
 	bool CheckForCompilerErrors(GLuint shaderProgram);
 
 	bool CheckForLinkErrors(GLuint program);
-
-	GLuint currentDiffuseMap = 0;
-	GLuint currentShaderProgram = 0;
 
 
 	//Getters

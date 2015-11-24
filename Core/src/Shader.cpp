@@ -1,24 +1,15 @@
 #include "Shader.h"
 
-//Load it from a memory buffer
-GLuint Shader::LoadShaderFromMemory(const char * pMem, SHADER_TYPE shaderType)
+Shader::Shader(const std::string& filename, SHADER_TYPE shaderType)
 {
-	GLuint program = glCreateShader(shaderType);
-	glShaderSource(program, 1, &pMem, NULL);
-	glCompileShader(program);
-	return program;
-}
-
-//Load Shader from File
-GLuint Shader::LoadShaderFromFile(const std::string& filename, SHADER_TYPE shaderType)
-{
+	type = shaderType;
 	string fileContents;
 	ifstream file;
 	file.open(filename.c_str(), std::ios::in);
 	if (!file)
 	{
 		cout << "File could not be loaded" << endl;
-		return 0;
+		return;
 	}
 
 	//calculate file size
@@ -30,17 +21,31 @@ GLuint Shader::LoadShaderFromFile(const std::string& filename, SHADER_TYPE shade
 		if (len == 0)
 		{
 			std::cout << "File has no contents " << std::endl;
-			return 0;
+			return;
 		}
 
 		fileContents.resize(len);
 		file.read(&fileContents[0], len);
 		file.close();
 		GLuint program = LoadShaderFromMemory(fileContents.c_str(), shaderType);
-		return program;
+		currentShaderProgram = program;
 	}
+	else
+		cout << "Cannot load shader " + filename << endl;
+}
 
-	return 0;
+Shader::~Shader()
+{
+
+}
+
+//Load it from a memory buffer
+GLuint Shader::LoadShaderFromMemory(const char * pMem, SHADER_TYPE shaderType)
+{
+	GLuint program = glCreateShader(shaderType);
+	glShaderSource(program, 1, &pMem, NULL);
+	glCompileShader(program);
+	return program;
 }
 
 bool Shader::CheckForCompilerErrors(GLuint shaderProgram)
