@@ -9,14 +9,14 @@ MeshRenderer::MeshRenderer()
 	glGenBuffers(1, &VAO);
 	glBindBuffer(GL_ARRAY_BUFFER, VAO);
 
-	glBufferData(GL_ARRAY_BUFFER, gameObject->GetComponent<Mesh>()->verticesSize*sizeof(Vertex), &gameObject->GetComponent<Mesh>()->vertices, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, gameObject->GetComponent<Mesh>()->vertices.size()*sizeof(Vertex), &gameObject->GetComponent<Mesh>()->vertices, GL_STATIC_DRAW);
 
 	//create buffer
 	glGenBuffers(1, &EBO);
 	//Make the EBO active
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
 	//Copy Index data to the EBO
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, gameObject->GetComponent<Mesh>()->indicesSize*sizeof(int), &gameObject->GetComponent<Mesh>()->indices, GL_STATIC_DRAW);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, gameObject->GetComponent<Mesh>()->indices.size()*sizeof(int), &gameObject->GetComponent<Mesh>()->indices, GL_STATIC_DRAW);
 
 	//Tell the shader that 0 is the position element
 	glEnableVertexAttribArray(0);
@@ -80,7 +80,7 @@ void MeshRenderer::Render()
 
 			glBindVertexArray(VAO);
 			if (VAO > 0)
-				glDrawElements(GL_TRIANGLES, gameObject->GetComponent<Mesh>()->indicesSize, GL_UNSIGNED_INT, 0);
+				glDrawElements(GL_TRIANGLES, gameObject->GetComponent<Mesh>()->indices.size(), GL_UNSIGNED_INT, 0);
 		}
 	}
 	

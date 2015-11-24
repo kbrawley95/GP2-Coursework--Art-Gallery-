@@ -8,17 +8,17 @@ int main(int argc, char *argv[])
 	Core engine = Core(800, 600);
 
 	//Create New Scene & Setup Camera
-	Scene* artGallery = new Scene(new Camera(90, 1, 0.1f, 1000));
+	Scene* artGallery = new Scene(shared_ptr<Camera>(new Camera(90, 1, 0.1f, 1000)));
 	engine.scene = artGallery;
 
 	//Create New Object
 	shared_ptr<GameObject> artGalleryModel = shared_ptr<GameObject>(new GameObject());
 	//Add a mesh component to store the mesh
-	artGalleryModel->components.push_back(new Mesh(MODEL_PATH + "/Art Gallery.fbx"));
+	artGalleryModel->AddComponent(shared_ptr<Mesh>(new Mesh(MODEL_PATH + "/Art Gallery.fbx")));
 	//Add a mesh renderer component to render stored mesh
-	MeshRenderer* render = new MeshRenderer();
+	shared_ptr<MeshRenderer> render = shared_ptr<MeshRenderer>(new MeshRenderer());
 	render->SetMaterial(shared_ptr<Material>(new Material(SHADER_PATH + "simpleColourVS.glsl", SHADER_PATH + "simpleColourFS.glsl")));
-	artGalleryModel->components.push_back(render);
+	artGalleryModel->AddComponent(render);
 	
 	artGallery->gameObjects.push_back(artGalleryModel);
 

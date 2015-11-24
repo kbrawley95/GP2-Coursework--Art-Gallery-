@@ -50,7 +50,7 @@ public:
 
 	}
 
-	void CalculateLighting(Light* light)
+	void CalculateLighting(shared_ptr<Light> light)
 	{
 		GLint ambientLightColourLocation = glGetUniformLocation(shader->currentShaderProgram, "ambientLightColour");
 		GLint ambientMaterialColourLocation = glGetUniformLocation(shader->currentShaderProgram, "ambientMaterialColour");

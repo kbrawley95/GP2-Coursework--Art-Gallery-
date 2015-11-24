@@ -14,7 +14,7 @@ public:
 	shared_ptr<GameObject> light;
 	vector<shared_ptr<GameObject>> gameObjects;
 
-	Scene(Camera* camera);
+	Scene(shared_ptr<Camera> camera);
 	~Scene();
 };
 

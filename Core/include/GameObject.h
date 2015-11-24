@@ -12,19 +12,22 @@ public:
 	string name;
 	string tag;
 	Transform transform;
-	vector<GameObject*> children;
-	vector<Component*> components;
+	vector<shared_ptr<GameObject>> children;
+	vector<shared_ptr<Component>> components;
+
+	void AddComponent(shared_ptr<Component> component)
+	{
+		component->gameObject = this;
+		components.push_back(component);
+	}
 
 	//Gets a component type that is attached to the gameobject (T is the type of component e.g. Mesh)
 	template <typename T>
-	T* GetComponent()
+	shared_ptr<T> GetComponent()
 	{
-		for (Component* m : components)
+		for (auto m = components.begin(); m != components.end(); ++m)
 		{
-			if (dynamic_cast<T*>(m) != NULL)
-			{
-				return dynamic_cast<T*>(m);
-			}
+			cout << "working?" << endl;
 		}
 		return NULL;
 	}
