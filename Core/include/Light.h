@@ -8,7 +8,16 @@
 class Light :public Component
 {
 public:
+
+	Light();
+	~Light();
 	//Getters
+	vec3& GetLightDirection()
+	{
+		return direction;
+	};
+
+
 	vec4& GetAmbientLightColour()
 	{
 		return ambientLightColour;
@@ -33,10 +42,11 @@ public:
 
 private:
 
-	vec4 ambientLightColour = vec4(1.0f, 1.0f, 1.0f, 1.0f);
-	vec4 diffuseLightColour = vec4(1.0f, 1.0f, 1.0f, 1.0f);
-	vec4 specularLightColour = vec4(1.0f, 1.0f, 1.0f, 1.0f);
-	float specularPower = 25.0f;
+	vec4 ambientLightColour;
+	vec4 diffuseLightColour;
+	vec4 specularLightColour;
+	float specularPower;
+	vec3 direction;
 };
 
 #endif
