@@ -48,27 +48,27 @@ public:
 
 	void CalculateLighting(shared_ptr<Light> light)
 	{
-		GLint ambientLightColourLocation = glGetUniformLocation(currentShaderProgram, "ambientLightColour");
-		GLint ambientMaterialColourLocation = glGetUniformLocation(currentShaderProgram, "ambientMaterialColour");
+		GLint ambientLightColourLocation = glGetUniformLocation(vs->currentShaderProgram, "ambientLightColour");
+		GLint ambientMaterialColourLocation = glGetUniformLocation(vs->currentShaderProgram, "ambientMaterialColour");
 
-		GLint diffuseLightColourLocation = glGetUniformLocation(currentShaderProgram, "diffuseLightColour");
-		GLint diffuseLightMaterialLocation = glGetUniformLocation(currentShaderProgram, "diffuseMaterialColour");
-		GLint lightDirectionLocation = glGetUniformLocation(currentShaderProgram, "lightDirection");
+		GLint diffuseLightColourLocation = glGetUniformLocation(vs->currentShaderProgram, "diffuseLightColour");
+		GLint diffuseLightMaterialLocation = glGetUniformLocation(vs->currentShaderProgram, "diffuseMaterialColour");
+		GLint lightDirectionLocation = glGetUniformLocation(vs->currentShaderProgram, "lightDirection");
 
-		GLint specularLightColourLocation = glGetUniformLocation(currentShaderProgram, "specularLightColour");
-		GLint specularLightMaterialLocation = glGetUniformLocation(currentShaderProgram, "specularMaterialColour");
-		GLint specularPowerLocation = glGetUniformLocation(currentShaderProgram, "specularPower");
+		GLint specularLightColourLocation = glGetUniformLocation(vs->currentShaderProgram, "specularLightColour");
+		GLint specularLightMaterialLocation = glGetUniformLocation(vs->currentShaderProgram, "specularMaterialColour");
+		GLint specularPowerLocation = glGetUniformLocation(vs->currentShaderProgram, "specularPower");
 
-		glUniform4fv(ambientLightColourLocation, 1, value_ptr(GetAmbientLightColour()));
+		glUniform4fv(ambientLightColourLocation, 1, value_ptr(light->GetAmbientLightColour()));
 		glUniform4fv(ambientMaterialColourLocation, 1, value_ptr(GetAmbientMaterial()));
 
-		glUniform4fv(diffuseLightColourLocation, 1, value_ptr(GetDiffuseLightColour()));
-		glUniform4fv(diffuseLightMaterialLocation, 1, value_ptr(gameObject->GetDiffuseMaterial()));
-		glUniform3fv(lightDirectionLocation, 1, value_ptr(camera->GetLightDirection()));
+		glUniform4fv(diffuseLightColourLocation, 1, value_ptr(light->GetDiffuseLightColour()));
+		glUniform4fv(diffuseLightMaterialLocation, 1, value_ptr(GetDiffuseMaterial()));
+		glUniform3fv(lightDirectionLocation, 1, value_ptr(light->GetLightDirection()));
 
-		glUniform4fv(specularLightColourLocation, 1, value_ptr(GetSpecularLightColour()));
-		glUniform4fv(specularLightMaterialLocation, 1, value_ptr(gameObject->GetSpecularMaterial()));
-		glUniform1f(specularPowerLocation, GetSpecularPower());
+		glUniform4fv(specularLightColourLocation, 1, value_ptr(light->GetSpecularLightColour()));
+		glUniform4fv(specularLightMaterialLocation, 1, value_ptr(GetSpecularMaterial()));
+		glUniform1f(specularPowerLocation, light->GetSpecularPower());
 	}
 
 private:
