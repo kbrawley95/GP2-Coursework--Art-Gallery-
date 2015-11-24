@@ -4,7 +4,7 @@
 #include"Common.h"
 #include "Component.h"
 
-class Material :public Component
+class Material : public Component
 {
 public:
 	vec4& GetAmbientMaterial()
@@ -21,6 +21,23 @@ public:
 	{
 		return m_SpecularMaterial;
 	};
+
+	//Use Defuse shader by default
+	Material()
+	{
+		//Compile Shader
+	}
+
+	Material(shared_ptr<Shader> shader)
+	{
+		//Compile Shader
+	}
+
+	//Memory cleanup
+	~Material()
+	{
+
+	}
 
 private:
 	vec4 m_AmbientMaterial;

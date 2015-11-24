@@ -3,6 +3,7 @@
 
 #include "Common.h"
 #include "Component.h"
+#include "Material.h"
 
 class Light :public Component
 {
