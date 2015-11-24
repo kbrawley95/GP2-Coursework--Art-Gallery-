@@ -2,26 +2,29 @@
 #define _MESHRENDERER
 
 #include "Common.h"
+#include "Mesh.h"
 #include "Component.h"
 #include "Camera.h"
-#include "Shader.h"
-#include "Mesh.h"
+#include "Light.h"
+#include "Material.h"
 
 class MeshRenderer : public Component
 {
 public:
+
+	
 	MeshRenderer();
 	~MeshRenderer();
 
-	void Update();
-	void RenderGameObject(Camera* camera);
+	void RenderGameObject(Camera* camera, shared_ptr<Light> light);
+
+	void Update(Camera* camera, shared_ptr<Light> light);
 
 private:
 
-	Shader* shader;
-
+	shared_ptr<Material> material;
 	mat4 MVPMatrix;
-	GLuint fullScreenShaderProgram;
 };
 
 #endif
+

@@ -32,37 +32,8 @@ public:
 	mat4 GetModelMatrix();
 	
 
-	void LoadShader(const string& vsFilename, const string& fsFilename, Shader* shader);
+	void LoadShader(const string& vsFilename, const string& fsFilename);
 
-	GLuint GetVertexArrayObject()
-	{
-		return m_VAO;
-	};
-
-	GLuint GetShaderProgram()
-	{
-		return m_ShaderProgram;
-	};
-
-	vec4& GetAmbientMaterial()
-	{
-		return m_AmbientMaterial;
-	};
-
-	vec4& GetDiffuseMaterial()
-	{
-		return m_DiffuseMaterial;
-	};
-
-	vec4& GetSpecularMaterial()
-	{
-		return m_SpecularMaterial;
-	};
-
-	float GetSpecularPower()
-	{
-		return m_SpecularPower;
-	};
 
 	int GetNumberOfIndices()
 	{
@@ -87,10 +58,7 @@ private:
 
 	mat4 m_ModelMatrix;
 
-	GLuint m_VBO;
-	GLuint m_EBO;
-	GLuint m_VAO;
-	GLuint m_ShaderProgram;
+
 	int m_NoOfIndices;
 	int m_NoOfVertices;
 
@@ -98,12 +66,7 @@ private:
 	vec3 m_Rotation;
 	vec3 m_Scale;
 
-	vec4 m_AmbientMaterial;
-	vec4 m_DiffuseMaterial;
-	vec4 m_SpecularMaterial;
-	float m_SpecularPower;
-
-	GLuint m_DiffuseMap;
+	
 	
 };
 
