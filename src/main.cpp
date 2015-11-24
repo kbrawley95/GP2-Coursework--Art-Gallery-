@@ -12,21 +12,17 @@ int main(int argc, char *argv[])
 	engine.scene = artGallery;
 
 	//Create New Object
-	GameObject* artGalleryModel = new GameObject();
+	shared_ptr<GameObject> artGalleryModel = shared_ptr<GameObject>(new GameObject());
 	//Add a mesh component to store the mesh
 	artGalleryModel->components.push_back(new Mesh(MODEL_PATH + "/Art Gallery.fbx"));
 	//Add a mesh renderer component to render stored mesh
-	//artGalleryModel->components.push_back(new MeshRenderer());
+	MeshRenderer* render = new MeshRenderer();
+	render->SetMaterial(shared_ptr<Material>(new Material(SHADER_PATH + "simpleColourVS.glsl", SHADER_PATH + "simpleColourFS.glsl")));
+	artGalleryModel->components.push_back(render);
+	
+	artGallery->gameObjects.push_back(artGalleryModel);
 
 	engine.Start();
-
-
-	shared_ptr<Shader> vs = shared_ptr<Shader>(new Shader(SHADER_PATH + "/shit.vs", Shader::SHADER_TYPE::VERTEX_SHADER));
-	shared_ptr<Shader> fs = shared_ptr<Shader>(new Shader(SHADER_PATH + "/shit.fs", Shader::SHADER_TYPE::FRAGMENT_SHADER));
-	shared_ptr<Material> blue = shared_ptr<Material>(new Material(vs, fs));
-	shared_ptr<MeshRenderer> mesh = shared_ptr<MeshRenderer>(new MeshRenderer(blue));
-
-
 
 	return 0;
 }

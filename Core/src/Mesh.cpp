@@ -142,6 +142,8 @@ void Mesh::processMesh(FbxMesh* mesh)
 {
 	int numVerts = mesh->GetControlPointsCount();
 	int numIndices = mesh->GetPolygonVertexCount();
+	verticesSize = numVerts;
+	indicesSize = numIndices;
 
 	Vertex* verts = new Vertex[numVerts];
 	int* ind = mesh->GetPolygonVertices();

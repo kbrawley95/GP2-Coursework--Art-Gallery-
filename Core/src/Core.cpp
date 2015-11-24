@@ -156,7 +156,7 @@ void Core::Render()
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 	//clear the colour and depth buffer
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
+	/*
 	if (scene != nullptr)
 	{
 		//Camera Render
@@ -174,10 +174,12 @@ void Core::Render()
 			}
 		}
 	}
+	*/
 }
 
 void Core::Update()
 {
+	/*
 	if (scene != nullptr)
 	{
 		//Camera Update
@@ -197,4 +199,5 @@ void Core::Update()
 			}
 		}
 	}
+	*/
 }

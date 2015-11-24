@@ -4,13 +4,15 @@
 #include "Common.h"
 #include "GameObject.h"
 #include "Camera.h"
+#include "Light.h"
 
 class Scene
 {
 public:
 	string name;
-	GameObject* camera;
-	vector<GameObject*> gameObjects;
+	shared_ptr<GameObject> camera;
+	shared_ptr<GameObject> light;
+	vector<shared_ptr<GameObject>> gameObjects;
 
 	Scene(Camera* camera);
 	~Scene();

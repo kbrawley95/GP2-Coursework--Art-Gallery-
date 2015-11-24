@@ -14,9 +14,8 @@ public:
 	};
 
 	GLuint currentShaderProgram = 0;
-	SHADER_TYPE type;
 
-	Shader(const std::string& filename, SHADER_TYPE shaderType);
+	Shader(const std::string& vs, const std::string& fs);
 	~Shader();	
 
 	GLuint LoadShaderFromMemory(const char * pMem, SHADER_TYPE shaderType);

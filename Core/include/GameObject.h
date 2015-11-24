@@ -45,11 +45,6 @@ public:
 		return m_NoOfVertices;
 	};
 
-	GLuint GetDiffuseMap()
-	{
-		return m_DiffuseMap;
-	};
-
 
 	GameObject();
 	~GameObject();
@@ -66,8 +61,6 @@ private:
 	vec3 m_Rotation;
 	vec3 m_Scale;
 
-	
-	
 };
 
 #endif

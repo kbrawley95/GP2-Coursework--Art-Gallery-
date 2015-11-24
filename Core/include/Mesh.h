@@ -12,6 +12,9 @@ public:
 	vector<Vertex> vertices;
 	vector<int> indices;
 
+	int verticesSize;
+	int indicesSize;
+
 	Mesh();
 	Mesh(string filename);
 

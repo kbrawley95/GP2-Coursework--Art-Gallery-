@@ -3,7 +3,6 @@
 
 #include "Common.h"
 #include "Component.h"
-#include "Material.h"
 
 class Light :public Component
 {
@@ -37,8 +36,6 @@ public:
 	{
 		return specularPower;
 	}
-
-	void CalculateLighting(shared_ptr <Material> material);
 
 private:
 

@@ -4,13 +4,13 @@
 #include"Common.h"
 #include "Component.h"
 #include "Shader.h"
+#include "Light.h"
 
-class Material : public Component
+class Material
 {
 public:
 
-	shared_ptr<Shader> vs;
-	shared_ptr<Shader> fs;
+	shared_ptr<Shader> shader;
 
 	vec4& GetAmbientMaterial()
 	{
@@ -27,17 +27,21 @@ public:
 		return m_SpecularMaterial;
 	};
 
+	GLuint& GetDiffuseMap()
+	{
+		return m_DiffuseMap;
+	};
+
 	//Use Defuse shader by default
 	Material()
 	{
 		//Compile Shader
 	}
 
-	Material(shared_ptr<Shader> vs, shared_ptr<Shader> fs)
+	Material(string vs, string fs)
 	{
 		//Compile Shader
-		Material::vs = vs;
-		Material::fs = fs;
+		shader = shared_ptr<Shader>(new Shader(vs, fs));
 	}
 
 	//Memory cleanup
@@ -46,18 +50,18 @@ public:
 
 	}
 
-	void CalculateLighting(shared_ptr<Light> light)
+	void CalculateLighting(Light* light)
 	{
-		GLint ambientLightColourLocation = glGetUniformLocation(vs->currentShaderProgram, "ambientLightColour");
-		GLint ambientMaterialColourLocation = glGetUniformLocation(vs->currentShaderProgram, "ambientMaterialColour");
+		GLint ambientLightColourLocation = glGetUniformLocation(shader->currentShaderProgram, "ambientLightColour");
+		GLint ambientMaterialColourLocation = glGetUniformLocation(shader->currentShaderProgram, "ambientMaterialColour");
 
-		GLint diffuseLightColourLocation = glGetUniformLocation(vs->currentShaderProgram, "diffuseLightColour");
-		GLint diffuseLightMaterialLocation = glGetUniformLocation(vs->currentShaderProgram, "diffuseMaterialColour");
-		GLint lightDirectionLocation = glGetUniformLocation(vs->currentShaderProgram, "lightDirection");
+		GLint diffuseLightColourLocation = glGetUniformLocation(shader->currentShaderProgram, "diffuseLightColour");
+		GLint diffuseLightMaterialLocation = glGetUniformLocation(shader->currentShaderProgram, "diffuseMaterialColour");
+		GLint lightDirectionLocation = glGetUniformLocation(shader->currentShaderProgram, "lightDirection");
 
-		GLint specularLightColourLocation = glGetUniformLocation(vs->currentShaderProgram, "specularLightColour");
-		GLint specularLightMaterialLocation = glGetUniformLocation(vs->currentShaderProgram, "specularMaterialColour");
-		GLint specularPowerLocation = glGetUniformLocation(vs->currentShaderProgram, "specularPower");
+		GLint specularLightColourLocation = glGetUniformLocation(shader->currentShaderProgram, "specularLightColour");
+		GLint specularLightMaterialLocation = glGetUniformLocation(shader->currentShaderProgram, "specularMaterialColour");
+		GLint specularPowerLocation = glGetUniformLocation(shader->currentShaderProgram, "specularPower");
 
 		glUniform4fv(ambientLightColourLocation, 1, value_ptr(light->GetAmbientLightColour()));
 		glUniform4fv(ambientMaterialColourLocation, 1, value_ptr(GetAmbientMaterial()));

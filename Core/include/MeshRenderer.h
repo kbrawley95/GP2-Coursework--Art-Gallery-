@@ -5,20 +5,24 @@
 #include "Mesh.h"
 #include "Component.h"
 #include "Camera.h"
-#include "Light.h"
 #include "Material.h"
+#include "GameObject.h"
 
 class MeshRenderer : public Component
 {
 public:
-
+	GLuint VBO;
+	GLuint EBO;
+	GLuint VAO;
 	
 	MeshRenderer();
 	~MeshRenderer();
 
-	void RenderGameObject(Camera* camera, shared_ptr<Light> light);
+	void SetMaterial(shared_ptr<Material> material);
+	shared_ptr<Material> GetMaterial();
 
-	void Update(Camera* camera, shared_ptr<Light> light);
+	void Update();
+	void Render();
 
 private:
 

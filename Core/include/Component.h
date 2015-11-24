@@ -7,6 +7,8 @@ class Component
 {
 public:
 	GameObject* gameObject;
+	GameObject* mainCamera;
+	GameObject* mainLight;
 
 	Component()
 	{
