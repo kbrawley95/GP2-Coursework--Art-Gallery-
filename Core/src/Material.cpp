@@ -3,7 +3,7 @@
 Material::Material()
 {
 	//Compile Shader
-	shader = shared_ptr<Shader>(new Shader("", ""));
+	shader = shared_ptr<Shader>(new Shader("simpleColourVS.glsl", "simpleColourFS.glsl"));
 }
 
 Material::Material(string vs, string fs)

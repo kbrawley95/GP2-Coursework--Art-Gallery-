@@ -4,7 +4,7 @@
 #include "Common.h"
 #include "Component.h"
 
-class Shader : public Component
+class Shader
 {
 public:
 	enum SHADER_TYPE

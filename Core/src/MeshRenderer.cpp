@@ -1,6 +1,6 @@
 #include "MeshRenderer.h"
 
-MeshRenderer::MeshRenderer()
+MeshRenderer::MeshRenderer(shared_ptr<GameObject> g) : Component(g)
 {
 	//Generate Vertex Array
 	glGenVertexArrays(1, &VAO);
@@ -10,7 +10,6 @@ MeshRenderer::MeshRenderer()
 	glBindBuffer(GL_ARRAY_BUFFER, VAO);
 
 	glBufferData(GL_ARRAY_BUFFER, gameObject->GetComponent<Mesh>()->vertices.size()*sizeof(Vertex), &gameObject->GetComponent<Mesh>()->vertices, GL_STATIC_DRAW);
-
 	//create buffer
 	glGenBuffers(1, &EBO);
 	//Make the EBO active
@@ -49,6 +48,7 @@ shared_ptr<Material> MeshRenderer::GetMaterial()
 
 void MeshRenderer::Render()
 {
+	return;
 	if (material != nullptr)
 	{
 		MVPMatrix = MainCamera->GetComponent<Camera>()->GetLookAt()*gameObject->GetModelMatrix();

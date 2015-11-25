@@ -16,7 +16,7 @@ public:
 	GLuint EBO;
 	GLuint VAO;
 
-	MeshRenderer();
+	MeshRenderer(shared_ptr<GameObject> g);
 	~MeshRenderer();
 
 	void SetMaterial(shared_ptr<Material> material);

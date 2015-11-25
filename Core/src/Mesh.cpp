@@ -1,11 +1,17 @@
 #include "Mesh.h"
 
-Mesh::Mesh()
+Mesh::Mesh(shared_ptr<GameObject> g) : Component(g)
 {
 
 }
 
-Mesh::Mesh(string filename)
+Mesh::~Mesh()
+{
+	vertices.clear();
+	indices.clear();
+}
+
+void Mesh::LoadFBX(string filename)
 {
 	std::cout << "Loading " + filename << std::endl;
 	//Initialize the SDK manager. This object handles memory management
@@ -41,12 +47,6 @@ Mesh::Mesh(string filename)
 	}
 
 	importer->Destroy();
-}
-
-Mesh::~Mesh()
-{
-	vertices.clear();
-	indices.clear();
 }
 
 //Return a string based representation based on the attribute type

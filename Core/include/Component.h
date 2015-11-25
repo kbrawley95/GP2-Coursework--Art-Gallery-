@@ -10,6 +10,16 @@ class Component
 public:
 	shared_ptr<GameObject> gameObject;
 
+	Component(shared_ptr<GameObject> g)
+	{
+		gameObject = g;
+	}
+
+	~Component()
+	{
+
+	}
+
 	virtual void Start()
 	{
 

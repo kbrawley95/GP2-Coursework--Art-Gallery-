@@ -5,11 +5,21 @@
 #include "Component.h"
 #include "Transform.h"
 
-class GameObject
+class GameObject : public enable_shared_from_this<GameObject>
 {
 public:
 	string name;
 	shared_ptr<Transform> transform;
+
+	GameObject()
+	{
+
+	}
+
+	GameObject(string name)
+	{
+		GameObject::name = name;
+	}
 
 	mat4 GetModelMatrix()
 	{
@@ -24,15 +34,17 @@ public:
 		return modelMatrix;
 	}
 
-	vector<shared_ptr<Component>> GetComponents()
+	const vector<shared_ptr<Component>>& GetComponents()
 	{
 		return components;
 	}
 
-	void AddComponent(shared_ptr<Component> component)
+	template <typename T>
+	shared_ptr<T> AddComponent()
 	{
-		component->gameObject = shared_ptr<GameObject>(this);
+		shared_ptr<T> component = shared_ptr<T>(new T(shared_from_this()));
 		components.push_back(component);
+		return component;
 	}
 
 	//Gets a component type that is attached to the gameobject (T is the type of component e.g. Mesh)

@@ -1,7 +1,11 @@
 #include "Camera.h"
 
-Camera::Camera(float fov, float aspect, float zNear, float zFar)
+Camera::Camera(shared_ptr<GameObject> g) : Component(g)
 {
+	fov = 90;
+	aspect = 1;
+	zNear = 0.1f;
+	zFar = 1000;
 	forward = vec3(0, 0, 1);
 	up = vec3(0, 1, 0);
 	projMatrix = perspective(fov, aspect, zNear, zFar);

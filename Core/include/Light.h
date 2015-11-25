@@ -8,8 +8,14 @@ class Light :public Component
 {
 public:
 
-	Light();
-	~Light();
+	Light(shared_ptr<GameObject> g) : Component(g)
+	{
+
+	}
+	~Light()
+	{
+
+	}
 
 	//Getters
 	vec3& GetLightDirection()

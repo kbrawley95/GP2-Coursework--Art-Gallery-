@@ -9,11 +9,15 @@
 class Camera : public Component
 {
 public:
+	float fov;
+	float aspect;
+	float zNear;
+	float zFar;
 
 	mat4 GetLookAt();
 	void Update();
 
-	Camera(float fov, float aspect, float zNear, float zFar);
+	Camera(shared_ptr<GameObject> g);
 	~Camera();
 
 private:

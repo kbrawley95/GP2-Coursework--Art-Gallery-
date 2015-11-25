@@ -10,10 +10,10 @@ public:
 	vector<Vertex> vertices;
 	vector<int> indices;
 
-	Mesh();
-	Mesh(string filename);
-
+	Mesh(shared_ptr<GameObject> g);
 	~Mesh();
+
+	void LoadFBX(string filename);
 
 private:
 
