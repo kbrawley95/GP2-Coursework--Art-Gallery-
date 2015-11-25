@@ -48,7 +48,6 @@ shared_ptr<Material> MeshRenderer::GetMaterial()
 
 void MeshRenderer::Render()
 {
-	return;
 	if (material != nullptr)
 	{
 		MVPMatrix = MainCamera->GetComponent<Camera>()->GetLookAt()*gameObject->GetModelMatrix();
