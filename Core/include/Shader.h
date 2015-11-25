@@ -16,7 +16,7 @@ public:
 	GLuint currentShaderProgram = 0;
 
 	Shader(const std::string& vs, const std::string& fs);
-	~Shader();	
+	~Shader();
 
 	GLuint LoadShaderFromMemory(const char * pMem, SHADER_TYPE shaderType);
 
@@ -49,7 +49,7 @@ public:
 	}
 
 private:
-	
+
 	vec4 ambientLightColour = vec4(1.0f, 1.0f, 1.0f, 1.0f);
 	vec4 diffuseLightColour = vec4(1.0f, 1.0f, 1.0f, 1.0f);
 	vec4 specularLightColour = vec4(1.0f, 1.0f, 1.0f, 1.0f);

@@ -2,22 +2,36 @@
 #define _GAMEOBJECT_H
 
 #include "Common.h"
-#include "Transform.h"
 #include "Component.h"
-#include "Shader.h"
+#include "Transform.h"
 
 class GameObject
 {
 public:
 	string name;
-	string tag;
-	Transform transform;
-	vector<shared_ptr<GameObject>> children;
-	vector<shared_ptr<Component>> components;
+	shared_ptr<Transform> transform;
+
+	mat4 GetModelMatrix()
+	{
+		mat4 translationMatrix = translate(mat4(1.0f), transform->position.ConvertToVec3());
+		mat4 scaleMatrix = scale(mat4(1.0f), transform->scale.ConvertToVec3());
+
+		mat4 rotationMatrix = rotate(mat4(1.0f), transform->rotation.x, vec3(1.0f, 0.0f, 0.0f))*
+			rotate(mat4(1.0f), transform->rotation.y, vec3(0.0f, 1.0f, 0.0f))*
+			rotate(mat4(1.0f), transform->rotation.z, vec3(0.0f, 0.0f, 1.0f));
+
+		modelMatrix = translationMatrix*scaleMatrix*rotationMatrix;
+		return modelMatrix;
+	}
+
+	vector<shared_ptr<Component>> GetComponents()
+	{
+		return components;
+	}
 
 	void AddComponent(shared_ptr<Component> component)
 	{
-		component->gameObject = this;
+		component->gameObject = shared_ptr<GameObject>(this);
 		components.push_back(component);
 	}
 
@@ -25,45 +39,20 @@ public:
 	template <typename T>
 	shared_ptr<T> GetComponent()
 	{
-		for (auto m = components.begin(); m != components.end(); ++m)
+		for (shared_ptr<Component> i : components)
 		{
-			cout << "working?" << endl;
+			if (dynamic_pointer_cast<T>(i) != NULL && dynamic_pointer_cast<T>(i) != nullptr)
+			{
+				return dynamic_pointer_cast<T>(i);
+			}
 		}
 		return NULL;
 	}
 
-	mat4 GetModelMatrix();
-	
-
-	void LoadShader(const string& vsFilename, const string& fsFilename);
-
-
-	int GetNumberOfIndices()
-	{
-		return m_NoOfIndices;
-	};
-
-	int GetNumberOfVetices()
-	{
-		return m_NoOfVertices;
-	};
-
-
-	GameObject();
-	~GameObject();
-
 private:
-
-	mat4 m_ModelMatrix;
-
-
-	int m_NoOfIndices;
-	int m_NoOfVertices;
-
-	vec3 m_Position;
-	vec3 m_Rotation;
-	vec3 m_Scale;
-
+	vector<shared_ptr<GameObject>> children;
+	vector<shared_ptr<Component>> components;
+	mat4 modelMatrix;
 };
 
 #endif

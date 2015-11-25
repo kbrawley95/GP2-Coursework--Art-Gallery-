@@ -1,10 +1,8 @@
 #ifndef _MESH_H
 #define _MESH_H
 
-#include "Component.h"
-#include "Common.h"
 #include "Vertex.h"
-#include <fbxsdk.h>
+#include "Component.h"
 
 class Mesh : public Component
 {

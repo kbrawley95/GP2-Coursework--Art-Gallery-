@@ -7,6 +7,7 @@
 #include "Camera.h"
 #include "Material.h"
 #include "GameObject.h"
+#include "Scene.h"
 
 class MeshRenderer : public Component
 {
@@ -14,7 +15,7 @@ public:
 	GLuint VBO;
 	GLuint EBO;
 	GLuint VAO;
-	
+
 	MeshRenderer();
 	~MeshRenderer();
 
@@ -31,4 +32,3 @@ private:
 };
 
 #endif
-

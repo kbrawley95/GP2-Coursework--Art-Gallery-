@@ -1,20 +1,21 @@
-#ifndef _COMPONENT_H
-#define _COMPONENT_H
+#ifndef _COMPONENTS_H
+#define _COMPONENTS_H
+
+#include "Common.h"
 
 class GameObject;
 
 class Component
 {
 public:
-	GameObject* gameObject;
-	GameObject* mainCamera;
-	GameObject* mainLight;
+	shared_ptr<GameObject> gameObject;
 
-	Component()
+	virtual void Start()
 	{
 
 	}
-	~Component()
+
+	virtual void Input(SDL_Event* e)
 	{
 
 	}
@@ -23,14 +24,12 @@ public:
 	{
 
 	}
+
 	virtual void Render()
 	{
 
 	}
-	virtual void Start()
-	{
 
-	}
 };
 
 #endif

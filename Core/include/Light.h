@@ -10,12 +10,12 @@ public:
 
 	Light();
 	~Light();
+
 	//Getters
 	vec3& GetLightDirection()
 	{
 		return direction;
 	};
-
 
 	vec4& GetAmbientLightColour()
 	{
@@ -38,7 +38,6 @@ public:
 	}
 
 private:
-
 	vec4 ambientLightColour;
 	vec4 diffuseLightColour;
 	vec4 specularLightColour;

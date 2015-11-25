@@ -49,10 +49,9 @@ shared_ptr<Material> MeshRenderer::GetMaterial()
 
 void MeshRenderer::Render()
 {
-	
 	if (material != nullptr)
 	{
-		MVPMatrix = mainCamera->GetComponent<Camera>()->GetLookAt()*gameObject->GetModelMatrix();
+		MVPMatrix = MainCamera->GetComponent<Camera>()->GetLookAt()*gameObject->GetModelMatrix();
 		if (material->shader->currentShaderProgram > 0)
 		{
 			glUseProgram(material->shader->currentShaderProgram);
@@ -63,7 +62,7 @@ void MeshRenderer::Render()
 			/*
 			if (material->getDiffuseMap() > 0)
 			{
-				currentDiffuseMap = gameObject->getDiffuseMap();
+			currentDiffuseMap = gameObject->getDiffuseMap();
 			}
 			*/
 			glActiveTexture(GL_TEXTURE0);
@@ -73,9 +72,9 @@ void MeshRenderer::Render()
 			glUniformMatrix4fv(MVPLocation, 1, GL_FALSE, value_ptr(MVPMatrix));
 			glUniformMatrix4fv(modelLocation, 1, GL_FALSE, value_ptr(gameObject->GetModelMatrix()));
 
-			glUniform3fv(cameraPositionLocation, 1, value_ptr(mainCamera->transform.position.ConvertToVec3()));
+			glUniform3fv(cameraPositionLocation, 1, value_ptr(MainCamera->transform->position.ConvertToVec3()));
 
-			material->CalculateLighting(mainLight->GetComponent<Light>());
+			material->CalculateLighting(MainLight->GetComponent<Light>());
 
 
 			glBindVertexArray(VAO);
@@ -83,7 +82,7 @@ void MeshRenderer::Render()
 				glDrawElements(GL_TRIANGLES, gameObject->GetComponent<Mesh>()->indices.size(), GL_UNSIGNED_INT, 0);
 		}
 	}
-	
+
 }
 
 void MeshRenderer::Update()

@@ -2,16 +2,15 @@
 #define _CORE_H
 
 #include "Common.h"
+#include "GameObject.h"
+#include "Component.h"
 #include "Scene.h"
-#include "Mesh.h"
-#include "MeshRenderer.h"
 
 class Core
 {
 public:
-	int width = 800;
-	int height = 600;
-	Scene* scene;
+	int width;
+	int height;
 
 	Core(int width, int height);
 	~Core();
