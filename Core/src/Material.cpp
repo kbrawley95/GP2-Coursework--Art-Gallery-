@@ -11,10 +11,14 @@ Material::Material(string vs, string fs)
 	//Compile Shader
 	shader = shared_ptr<Shader>(new Shader(vs, fs));
 }
+Material::Material(shared_ptr<Shader> s)
+{
+	shader = s;
+}
 
 Material::~Material()
 {
-
+	glDeleteTextures(1, &diffuseMap);
 }
 
 void Material::CalculateLighting(shared_ptr<Light> light)
@@ -44,7 +48,7 @@ void Material::CalculateLighting(shared_ptr<Light> light)
 
 void Material::SetMainTexture(const string& filename)
 {
-	m_DiffuseMap = LoadTextureFromFile(filename);
+	diffuseMap = LoadTextureFromFile(filename);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);

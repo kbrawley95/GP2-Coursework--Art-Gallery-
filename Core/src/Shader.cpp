@@ -81,8 +81,7 @@ bool Shader::CheckForCompilerErrors(GLuint shaderProgram)
 		GLint maxLength = 0;
 		glGetShaderiv(shaderProgram, GL_INFO_LOG_LENGTH, &maxLength);
 		//The maxLength includes the NULL character
-		string infoLog;
-		infoLog.resize(maxLength);
+		char* infoLog = new char[maxLength];
 		glGetShaderInfoLog(shaderProgram, maxLength, &maxLength, &infoLog[0]);
 		cout << "Shader not compiled " << infoLog << endl;
 		//We don't need the shader anymore.
@@ -97,7 +96,8 @@ bool Shader::CheckForLinkErrors(GLuint program)
 {
 	GLint isLinked = 0;
 	glGetProgramiv(program, GL_LINK_STATUS, &isLinked);
-	if (isLinked == GL_FALSE) {
+	if (isLinked == GL_FALSE) 
+	{
 		GLint maxLength = 0;
 		glGetProgramiv(program, GL_INFO_LOG_LENGTH, &maxLength);
 		//The maxLength includes the NULL character

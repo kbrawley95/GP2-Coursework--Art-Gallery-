@@ -13,7 +13,7 @@ int main(int argc, char *argv[])
 
 	//Create Camera
 	MainCamera = shared_ptr<GameObject>(new GameObject("Main Camera"));
-	MainCamera->transform.position = Vector3(0, 0, 1);
+	MainCamera->transform.position = Vector3(0, 0, 0);
 	shared_ptr<Camera> cam = MainCamera->AddComponent<Camera>();
 	cam->fov = 90;
 	cam->aspect = 1;
@@ -26,20 +26,16 @@ int main(int argc, char *argv[])
 	MainLight->AddComponent<Light>();
 	GameObjects.push_back(MainLight);
 
-	//Create New Object
-	shared_ptr<GameObject> artGalleryModel = shared_ptr<GameObject>(new GameObject("Art Galary Model"));
-	artGalleryModel->transform.position = Vector3(0 , 0, 0);
-	//Add a mesh component to store the mesh
-	shared_ptr<Mesh> m = artGalleryModel->AddComponent<Mesh>();
-	m->LoadFBX(MODEL_PATH + "/armoredrecon.fbx");
-	//Add a mesh renderer component to render stored mesh
-	shared_ptr<MeshRenderer> render = artGalleryModel->AddComponent<MeshRenderer>();
-	shared_ptr<Material> mat = shared_ptr<Material>(new Material(SHADER_PATH + "/textureVS.glsl", SHADER_PATH + "/textureFS.glsl"));
-	mat->SetMainTexture(TEXTURE_PATH+"/armoredrecon_diff.png");
-	render->SetMaterial(mat);
-	
-	//Add object to the list
-	GameObjects.push_back(artGalleryModel);
+	//Load Mesh Into Game Object
+	shared_ptr<GameObject> obj = loadFBXFromFile(MODEL_PATH + "/armoredrecon.fbx");
+	shared_ptr<Material> material = shared_ptr<Material>(new Material(shared_ptr<Shader>(new Shader(SHADER_PATH + "/textureVS.glsl", SHADER_PATH + "/textureFS.glsl"))));
+	for (auto i = (*obj).GetChildern()->begin(); i != (*obj).GetChildern()->end(); ++i)
+	{
+		shared_ptr<Mesh> m = (*i)->GetComponent<Mesh>();
+		if (m != nullptr)
+			m->SetMaterial(material);
+	}
+	GameObjects.push_back(obj);
 
 	engine->Start();
 }

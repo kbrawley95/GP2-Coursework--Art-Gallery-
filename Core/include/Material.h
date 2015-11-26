@@ -14,6 +14,7 @@ public:
 	shared_ptr<Shader> shader;
 	//Use Defuse shader by default
 	Material();
+	Material(shared_ptr<Shader> s);
 	Material(string vs, string fs);
 
 	//Memory cleanup
@@ -24,26 +25,26 @@ public:
 
 	vec4& GetAmbientMaterial()
 	{
-		return m_AmbientMaterial;
+		return ambientMaterial;
 	};
 	vec4& GetDiffuseMaterial()
 	{
-		return m_DiffuseMaterial;
+		return diffuseMaterial;
 	};
 	vec4& GetSpecularMaterial()
 	{
-		return m_SpecularMaterial;
+		return specularMaterial;
 	};
 	GLuint& GetDiffuseMap()
 	{
-		return m_DiffuseMap;
+		return diffuseMap;
 	}; 
 
 private:
-	vec4 m_AmbientMaterial;
-	vec4 m_DiffuseMaterial;
-	vec4 m_SpecularMaterial;
-	GLuint m_DiffuseMap;
+	vec4 ambientMaterial;
+	vec4 diffuseMaterial;
+	vec4 specularMaterial;
+	GLuint diffuseMap;
 
 };
 

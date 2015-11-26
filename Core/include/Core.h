@@ -6,7 +6,7 @@
 #include "Component.h"
 #include "Scene.h"
 #include "Mesh.h"
-#include "MeshRenderer.h"
+#include "FBXLoader.h"
 
 class Core
 {
