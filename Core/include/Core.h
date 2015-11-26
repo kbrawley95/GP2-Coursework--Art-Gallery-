@@ -22,6 +22,8 @@ public:
 private:
 	SDL_Window* window;
 	SDL_GLContext glContext;
+	int previousTime;
+	int currentTime;
 
 	void Render();
 	void Update();

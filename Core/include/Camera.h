@@ -5,30 +5,28 @@
 #include "Component.h"
 #include "GameObject.h"
 #include "Transform.h"
+#include "Scene.h"
 
 class Camera : public Component
 {
 public:
+	mat4 viewMatrix;
+	mat4 projMatrix;
+
 	float fov;
 	float aspect;
 	float zNear;
 	float zFar;
 
-	mat4 GetLookAt();
 	void Update();
+	void Input(SDL_Event* e);
 
 	Camera(shared_ptr<GameObject> g);
 	~Camera();
 
 private:
-	mat4 viewMatrix;
-	mat4 projMatrix;
 	vec3 forward;
 	vec3 up;
-
-	vec3 pos;
-	vec3 rot;
-	vec3 sca;
 };
 
 #endif

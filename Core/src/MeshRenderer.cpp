@@ -6,16 +6,16 @@ MeshRenderer::MeshRenderer(shared_ptr<GameObject> g) : Component(g)
 	glGenVertexArrays(1, &VAO);
 	glBindVertexArray(VAO);
 
-	glGenBuffers(1, &VAO);
-	glBindBuffer(GL_ARRAY_BUFFER, VAO);
+	glGenBuffers(1, &VBO);
+	glBindBuffer(GL_ARRAY_BUFFER, VBO);
 
-	glBufferData(GL_ARRAY_BUFFER, gameObject->GetComponent<Mesh>()->vertices.size()*sizeof(Vertex), &gameObject->GetComponent<Mesh>()->vertices, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, gameObject->GetComponent<Mesh>()->vertices.size()*sizeof(Vertex), &(gameObject->GetComponent<Mesh>()->vertices[0]), GL_STATIC_DRAW);
 	//create buffer
 	glGenBuffers(1, &EBO);
 	//Make the EBO active
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
 	//Copy Index data to the EBO
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, gameObject->GetComponent<Mesh>()->indices.size()*sizeof(int), &gameObject->GetComponent<Mesh>()->indices, GL_STATIC_DRAW);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, gameObject->GetComponent<Mesh>()->indices.size()*sizeof(int), &(gameObject->GetComponent<Mesh>()->indices[0]), GL_STATIC_DRAW);
 
 	//Tell the shader that 0 is the position element
 	glEnableVertexAttribArray(0);
@@ -50,38 +50,33 @@ void MeshRenderer::Render()
 {
 	if (material != nullptr)
 	{
-		MVPMatrix = MainCamera->GetComponent<Camera>()->GetLookAt()*gameObject->GetModelMatrix();
+		MVPMatrix = gameObject->GetModelMatrix() * MainCamera->GetComponent<Camera>()->viewMatrix * MainCamera->GetComponent<Camera>()->projMatrix;
 		if (material->shader->currentShaderProgram > 0)
 		{
 			glUseProgram(material->shader->currentShaderProgram);
 			GLint MVPLocation = glGetUniformLocation(material->shader->currentShaderProgram, "MVP");
-			GLint cameraPositionLocation = glGetUniformLocation(material->shader->currentShaderProgram, "cameraPosition");
 			GLint modelLocation = glGetUniformLocation(material->shader->currentShaderProgram, "Model");
 			GLint texture0Location = glGetUniformLocation(material->shader->currentShaderProgram, "texture0");
-			/*
-			if (material->getDiffuseMap() > 0)
+			GLint cameraPositionLocation = glGetUniformLocation(material->shader->currentShaderProgram, "cameraPosition");
+
+			if (material->GetDiffuseMap() > 0)
 			{
-			currentDiffuseMap = gameObject->getDiffuseMap();
+				glActiveTexture(GL_TEXTURE0);
+				glBindTexture(GL_TEXTURE_2D, material->GetDiffuseMap());
+				glUniform1i(texture0Location, 0);
 			}
-			*/
-			glActiveTexture(GL_TEXTURE0);
-			glBindTexture(GL_TEXTURE_2D, material->GetDiffuseMap());
-			glUniform1i(texture0Location, 0);
 
 			glUniformMatrix4fv(MVPLocation, 1, GL_FALSE, value_ptr(MVPMatrix));
 			glUniformMatrix4fv(modelLocation, 1, GL_FALSE, value_ptr(gameObject->GetModelMatrix()));
-
-			glUniform3fv(cameraPositionLocation, 1, value_ptr(MainCamera->transform->position.ConvertToVec3()));
+			glUniform3fv(cameraPositionLocation, 1, value_ptr(MainCamera->transform.position.ConvertToVec3()));
 
 			material->CalculateLighting(MainLight->GetComponent<Light>());
-
 
 			glBindVertexArray(VAO);
 			if (VAO > 0)
 				glDrawElements(GL_TRIANGLES, gameObject->GetComponent<Mesh>()->indices.size(), GL_UNSIGNED_INT, 0);
 		}
 	}
-
 }
 
 void MeshRenderer::Update()

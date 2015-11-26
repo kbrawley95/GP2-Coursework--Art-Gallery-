@@ -5,7 +5,7 @@ Shader::Shader(const std::string& vs, const std::string& fs)
 	GLuint vs_shader = LoadShaderFromFile(vs, VERTEX_SHADER);
 	CheckForCompilerErrors(vs_shader);
 
-	GLuint fs_shader = LoadShaderFromFile(vs, FRAGMENT_SHADER);
+	GLuint fs_shader = LoadShaderFromFile(fs, FRAGMENT_SHADER);
 	CheckForCompilerErrors(fs_shader);
 
 	currentShaderProgram = glCreateProgram();
@@ -27,7 +27,7 @@ Shader::Shader(const std::string& vs, const std::string& fs)
 
 Shader::~Shader()
 {
-
+	glDeleteProgram(currentShaderProgram);
 }
 
 GLuint Shader::LoadShaderFromFile(const std::string& filename, SHADER_TYPE shaderType)
@@ -101,11 +101,12 @@ bool Shader::CheckForLinkErrors(GLuint program)
 		GLint maxLength = 0;
 		glGetProgramiv(program, GL_INFO_LOG_LENGTH, &maxLength);
 		//The maxLength includes the NULL character
-		string infoLog;
+		char* infoLog = new char[maxLength];
 		glGetProgramInfoLog(program, maxLength, &maxLength, &infoLog[0]);
 		cout << "Shader not linked " << infoLog << endl;
 		//We don't need the shader anymore.
 		glDeleteProgram(program);
+		delete[] infoLog;
 		return true;
 	}
 	return false;

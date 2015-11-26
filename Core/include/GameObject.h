@@ -9,7 +9,7 @@ class GameObject : public enable_shared_from_this<GameObject>
 {
 public:
 	string name;
-	shared_ptr<Transform> transform;
+	Transform transform;
 
 	GameObject()
 	{
@@ -23,14 +23,14 @@ public:
 
 	mat4 GetModelMatrix()
 	{
-		mat4 translationMatrix = translate(mat4(1.0f), transform->position.ConvertToVec3());
-		mat4 scaleMatrix = scale(mat4(1.0f), transform->scale.ConvertToVec3());
+		mat4 translationMatrix = translate(mat4(1.0f), transform.position.ConvertToVec3());
+		mat4 scaleMatrix = scale(mat4(1.0f), transform.scale.ConvertToVec3());
 
-		mat4 rotationMatrix = rotate(mat4(1.0f), transform->rotation.x, vec3(1.0f, 0.0f, 0.0f))*
-			rotate(mat4(1.0f), transform->rotation.y, vec3(0.0f, 1.0f, 0.0f))*
-			rotate(mat4(1.0f), transform->rotation.z, vec3(0.0f, 0.0f, 1.0f));
+		mat4 rotationMatrix = rotate(mat4(1.0f), transform.rotation.x, vec3(1.0f, 0.0f, 0.0f))*
+			rotate(mat4(1.0f), transform.rotation.y, vec3(0.0f, 1.0f, 0.0f))*
+			rotate(mat4(1.0f), transform.rotation.z, vec3(0.0f, 0.0f, 1.0f));
 
-		modelMatrix = translationMatrix*scaleMatrix*rotationMatrix;
+		modelMatrix = scaleMatrix * rotationMatrix * translationMatrix;
 		return modelMatrix;
 	}
 

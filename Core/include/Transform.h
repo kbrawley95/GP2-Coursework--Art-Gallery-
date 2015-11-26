@@ -13,9 +13,9 @@ public:
 
 	Transform()
 	{
-		position = vec3(0, 0, 0);
-		rotation = vec3(0, 0, 0);
-		scale = vec3(1, 1, 1);
+		position = Vector3(0, 0, 0);
+		rotation = Vector3(0, 0, 0);
+		scale = Vector3(1, 1, 1);
 	}
 };
 

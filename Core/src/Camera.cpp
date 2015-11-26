@@ -9,7 +9,7 @@ Camera::Camera(shared_ptr<GameObject> g) : Component(g)
 	forward = vec3(0, 0, 1);
 	up = vec3(0, 1, 0);
 	projMatrix = perspective(fov, aspect, zNear, zFar);
-	viewMatrix = lookAt(pos, pos + forward, up);
+	viewMatrix = lookAt((*gameObject).transform.position.ConvertToVec3(), (*gameObject).transform.position.ConvertToVec3() + forward, up);
 }
 
 Camera::~Camera()
@@ -19,21 +19,34 @@ Camera::~Camera()
 
 void Camera::Update()
 {
-	viewMatrix = lookAt(pos, pos + forward, up);
+	viewMatrix = lookAt((*gameObject).transform.position.ConvertToVec3(), (*gameObject).transform.position.ConvertToVec3() + forward, up);
 
-	mat4 translationMatrix = translate(mat4(1.0f), pos);
-	mat4 scaleMatrix = scale(mat4(1.0f), sca);
+	mat4 translationMatrix = translate(mat4(1.0f), (*gameObject).transform.position.ConvertToVec3());
+	mat4 scaleMatrix = scale(mat4(1.0f), (*gameObject).transform.scale.ConvertToVec3());
 
-	mat4 rotationMatrix = rotate(mat4(1.0f), rot.x, vec3(1.0f, 0.0f, 0.0f))*
-		rotate(mat4(1.0f), rot.y, vec3(0.0f, 1.0f, 0.0f))*
-		rotate(mat4(1.0f), rot.z, vec3(0.0f, 0.0f, 1.0f));
-
-	gameObject->transform->position = pos;
-	gameObject->transform->rotation = rot;
-	gameObject->transform->scale = sca;
+	mat4 rotationMatrix = rotate(mat4(1.0f), (*gameObject).transform.rotation.ConvertToVec3().x, vec3(1.0f, 0.0f, 0.0f))*
+		rotate(mat4(1.0f), (*gameObject).transform.rotation.ConvertToVec3().y, vec3(0.0f, 1.0f, 0.0f))*
+		rotate(mat4(1.0f), (*gameObject).transform.rotation.ConvertToVec3().z, vec3(0.0f, 0.0f, 1.0f));
 }
 
-mat4 Camera::GetLookAt()
+void Camera::Input(SDL_Event* e)
 {
-	return projMatrix * viewMatrix;
+	if (e->type == SDL_KEYDOWN)
+	{
+		switch (e->key.keysym.sym)
+		{
+		case SDLK_a:
+			gameObject->transform.position.x -= 2.0f * deltaTime;
+			break;
+		case SDLK_d:
+			gameObject->transform.position.x += 2.0f * deltaTime;
+			break;
+		case SDLK_w:
+			gameObject->transform.position.z += 2.0f * deltaTime;
+			break;
+		case SDLK_s:
+			gameObject->transform.position.z -= 2.0f * deltaTime;
+			break;
+		}
+	}
 }

@@ -127,6 +127,10 @@ void Core::Start()
 	//Game Loop
 	bool run = true; while (run)
 	{
+		previousTime = currentTime;
+		currentTime = SDL_GetTicks();
+		deltaTime = (currentTime - previousTime) / 1000.0f;
+
 		//While we still have events in the queue
 		while (SDL_PollEvent(&event))
 		{

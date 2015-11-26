@@ -5,6 +5,7 @@
 #include "Component.h"
 #include "Shader.h"
 #include "Light.h"
+#include "Texture.h"
 
 class Material
 {
@@ -19,6 +20,7 @@ public:
 	~Material();
 
 	void CalculateLighting(shared_ptr<Light> light);
+	void SetMainTexture(const string& filename);
 
 	vec4& GetAmbientMaterial()
 	{
