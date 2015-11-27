@@ -13,9 +13,39 @@ public:
 	float zNear;
 	float zFar;
 
+	//Keyboard State
+	const Uint8 *keyboardState;
+	int currentTime, prevTime;
+	float deltaTime;
+
 	void Update()
 	{
+		prevTime = currentTime;
+		currentTime = SDL_GetTicks();
+		deltaTime = (currentTime - prevTime) / 1000.0f;
+		KeyboardState();
+	}
 
+	void KeyboardState()
+	{
+		keyboardState = SDL_GetKeyboardState(NULL);
+
+		if (keyboardState[SDL_SCANCODE_A])
+		{
+			transform.position.x += 10.0f*deltaTime;
+		}
+		else if (keyboardState[SDL_SCANCODE_D])
+		{
+			transform.position.x -= 10.0f*deltaTime;
+		}
+		else if (keyboardState[SDL_SCANCODE_W])
+		{
+			transform.position.z += 10.0f*deltaTime;
+		}
+		else if (keyboardState[SDL_SCANCODE_S])
+		{
+			transform.position.z -= 10.0f*deltaTime;
+		}
 	}
 
 	Camera()

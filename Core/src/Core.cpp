@@ -112,6 +112,16 @@ void Core::Start()
 		{
 			if (events.type == SDL_QUIT || events.type == SDL_WINDOWEVENT_CLOSE)
 				run = false;
+
+			if (events.type == SDL_KEYDOWN)
+			{
+				switch (events.key.keysym.sym)
+				{
+				case SDLK_ESCAPE:
+					run=false;
+					break;
+				}
+			}
 			Input(&events);
 		}
 
@@ -128,6 +138,7 @@ void Core::Input(SDL_Event* e)
 	for (auto i = GameObjects.begin(); i != GameObjects.end(); ++i)
 		for (std::shared_ptr<Component> j : (*i)->GetComponents())
 			j->Input(e);
+
 }
 
 void Core::Update()
