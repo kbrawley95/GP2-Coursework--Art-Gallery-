@@ -16,12 +16,20 @@ public:
 	~Material();
 	void LoadTexture(std::string filename);
 
+	//Skybox Functions
+	void SetCubeMapTextures(const std::string& posX, const std::string& negX, const std::string& posY, const std::string& negY, const std::string& posZ, const std::string& negZ);
+
+	GLuint LoadCubemapTexture(const std::string& posX, const std::string& negX, const std::string& posY, const std::string& negY, const std::string& posZ, const std::string& negZ);
+	void LoadCubeMapFace(const std::string& filename, GLenum face);
+
+
 	GLuint GetTexture();
 	GLuint GetShader();
 
 private:
 	GLuint shaderProgram;
 	GLuint diffuseMap;
+	GLuint environmentMap;
 
 	enum SHADER_TYPE
 	{
@@ -33,6 +41,7 @@ private:
 	bool CheckForCompilerErrors(GLuint shaderProgram);
 	bool CheckForLinkErrors(GLuint program);
 	GLuint LoadTextureFromFile(const std::string& filename);
+	
 	GLuint ConvertSDLSurfaceToTexture(SDL_Surface * surface);
 };
 

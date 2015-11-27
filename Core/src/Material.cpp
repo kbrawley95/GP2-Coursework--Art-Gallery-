@@ -52,6 +52,52 @@ void Material::LoadTexture(std::string filename)
 	glGenerateMipmap(GL_TEXTURE_2D);
 }
 
+GLuint Material::LoadCubemapTexture(const std::string& posX, const std::string& negX, const std::string& posY, const std::string& negY, const std::string& posZ, const std::string& negZ)
+{
+	GLuint textureObj;
+
+	glActiveTexture(GL_TEXTURE1);
+	glGenTextures(1, &textureObj);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, textureObj);
+
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_GENERATE_MIPMAP, GL_TRUE);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+
+	LoadCubeMapFace(posX, GL_TEXTURE_CUBE_MAP_POSITIVE_X);
+	LoadCubeMapFace(negX, GL_TEXTURE_CUBE_MAP_NEGATIVE_X);
+	LoadCubeMapFace(posY, GL_TEXTURE_CUBE_MAP_POSITIVE_Y);
+	LoadCubeMapFace(negX, GL_TEXTURE_CUBE_MAP_NEGATIVE_Y);
+	LoadCubeMapFace(posZ, GL_TEXTURE_CUBE_MAP_POSITIVE_Z);
+	LoadCubeMapFace(negX, GL_TEXTURE_CUBE_MAP_NEGATIVE_Z);
+
+
+	return textureObj;
+
+}
+
+void Material::LoadCubeMapFace(const std::string& filename, GLenum face)
+{
+	SDL_Surface* imageSurface = IMG_Load(filename.c_str());
+
+	GLenum	textureFormat = GL_RGB;
+	GLenum	internalFormat = GL_RGB8;
+
+
+	glTexImage2D(face, 0, internalFormat, imageSurface->w, imageSurface->h, 0, textureFormat, GL_UNSIGNED_BYTE, imageSurface->pixels);
+
+	SDL_FreeSurface(imageSurface);
+}
+
+void Material::SetCubeMapTextures(const std::string& posX, const std::string& negX, const std::string& posY, const std::string& negY, const std::string& posZ, const std::string& negZ)
+{
+	environmentMap = LoadCubemapTexture(posX, negX, posY, negY, posZ, negZ);
+}
+
+
 GLuint Material::GetTexture()
 {
 	return diffuseMap;

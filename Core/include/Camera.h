@@ -46,6 +46,24 @@ public:
 		{
 			transform.position.z -= 10.0f*deltaTime;
 		}
+
+		if (keyboardState[SDL_SCANCODE_LEFT])
+		{
+			transform.rotation.x += 10.0f*deltaTime;
+		}
+		else if (keyboardState[SDL_SCANCODE_RIGHT])
+		{
+			transform.rotation.x -= 10.0f*deltaTime;
+		}
+		else if (keyboardState[SDL_SCANCODE_UP])
+		{
+			transform.rotation.z += 10.0f*deltaTime;
+		}
+		else if (keyboardState[SDL_SCANCODE_DOWN])
+		{
+			transform.rotation.z -= 10.0f*deltaTime;
+		}
+
 	}
 
 	Camera()
