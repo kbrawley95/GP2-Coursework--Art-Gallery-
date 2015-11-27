@@ -5,11 +5,14 @@
 #include "GameObject.h"
 #include "Camera.h"
 #include "Scene.h"
-#include "TextureLoader.h"
+#include "Material.h"
+#include "Mesh.h"
+#include "DirectionalLight.h"
 
 class Core
 {
 public:
+	bool lighting;
 	int WIDTH;
 	int HEIGHT;
 	Core(int width, int height);

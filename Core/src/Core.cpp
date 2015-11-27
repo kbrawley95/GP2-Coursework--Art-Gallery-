@@ -2,6 +2,8 @@
 
 Core::Core(int width, int height)
 {
+	std::cout << "Starting up" << std::endl;
+	lighting = true;
 	WIDTH = width;
 	HEIGHT = height;
 
@@ -160,6 +162,31 @@ void Core::Render()
 
 			glUniformMatrix4fv(MVPLocation, 1, GL_FALSE, glm::value_ptr((*i)->GetMVPMatrix()));
 			glUniform1i(texture0Location, 0);
+
+			if (lighting)
+			{
+				GLint ambientLightColourLocation = glGetUniformLocation(m->material->GetShader(), "ambientLightColour");
+				GLint ambientMaterialColourLocation = glGetUniformLocation(m->material->GetShader(), "ambientMaterialColour");
+
+				GLint diffuseLightColourLocation = glGetUniformLocation(m->material->GetShader(), "diffuseLightColour");
+				GLint diffuseLightMaterialLocation = glGetUniformLocation(m->material->GetShader(), "diffuseMaterialColour");
+				GLint lightDirectionLocation = glGetUniformLocation(m->material->GetShader(), "lightDirection");
+
+				GLint specularLightColourLocation = glGetUniformLocation(m->material->GetShader(), "specularLightColour");
+				GLint specularLightMaterialLocation = glGetUniformLocation(m->material->GetShader(), "specularMaterialColour");
+				GLint specularPowerLocation = glGetUniformLocation(m->material->GetShader(), "specularPower");
+
+				glUniform4fv(ambientLightColourLocation, 1, value_ptr(MainLight->ambientLightColor.ConvertToVec4()));
+				glUniform4fv(ambientMaterialColourLocation, 1, value_ptr(m->material->ambientMaterial.ConvertToVec4()));
+
+				glUniform4fv(diffuseLightColourLocation, 1, value_ptr(MainLight->diffuseLightColor.ConvertToVec4()));
+				glUniform4fv(diffuseLightMaterialLocation, 1, value_ptr(m->material->diffuseMaterial.ConvertToVec4()));
+				glUniform3fv(lightDirectionLocation, 1, value_ptr(MainLight->direction.ConvertToVec3()));
+
+				glUniform4fv(specularLightColourLocation, 1, value_ptr(MainLight->specularLightColor.ConvertToVec4()));
+				glUniform4fv(specularLightMaterialLocation, 1, value_ptr(m->material->specularMaterial.ConvertToVec4()));
+				glUniform1f(specularPowerLocation, m->material->specularPower);
+			}
 
 			glBindVertexArray(m->VAO);
 			glBindBuffer(GL_ARRAY_BUFFER, m->VBO);

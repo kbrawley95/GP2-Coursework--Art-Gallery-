@@ -5,9 +5,9 @@
 
 class Camera;
 class GameObject;
-class Light;
+class DirectionalLight;
 
 extern std::shared_ptr<Camera> MainCamera;
-extern std::shared_ptr<Light> MainLight;
+extern std::shared_ptr<DirectionalLight> MainLight;
 extern std::vector<std::shared_ptr<GameObject>> GameObjects;
 #endif

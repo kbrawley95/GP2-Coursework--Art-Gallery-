@@ -60,4 +60,42 @@ struct Vector3
 	}
 };
 
+struct Vector4
+{
+	float x;
+	float y;
+	float z;
+	float w;
+
+	Vector4()
+	{
+		x = 0;
+		y = 0;
+		z = 0;
+	}
+
+	Vector4(float a, float b, float c, float d)
+	{
+		x = a;
+		y = b;
+		z = c;
+		w = d;
+	}
+
+	Vector4 operator+(Vector4 a)
+	{
+		return{ x + a.x, y + a.y, z + a.z, w + a.w };
+	}
+
+	Vector4 operator=(glm::vec4 a)
+	{
+		return{ a.x, a.y, a.z, a.w };
+	}
+
+	glm::vec4 ConvertToVec4()
+	{
+		return glm::vec4(x, y, z, w);
+	}
+};
+
 #endif

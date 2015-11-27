@@ -2,16 +2,21 @@
 
 Material::Material(std::string vsPath, std::string fsPath)
 {
+	ambientMaterial = Vector4(0.3f, 0.3f, 0.3f, 1.0f);
+	diffuseMaterial = Vector4(0.8f, 0.8f, 0.8f, 1.0f);
+	specularMaterial = Vector4(1.0f, 1.0f, 1.0f, 1.0f);
+	specularPower = 25.0f;
+
 	std::cout << "Loading " << std::endl;
 	std::cout << "-" << vsPath << std::endl;
 	std::cout << "-" << fsPath << std::endl << std::endl;
 	GLuint vertexShaderProgram = 0;
-	vertexShaderProgram = loadShaderFromFile(vsPath, VERTEX_SHADER);
-	checkForCompilerErrors(vertexShaderProgram);
+	vertexShaderProgram = LoadShaderFromFile(vsPath, VERTEX_SHADER);
+	CheckForCompilerErrors(vertexShaderProgram);
 
 	GLuint fragmentShaderProgram = 0;
-	fragmentShaderProgram = loadShaderFromFile(fsPath, FRAGMENT_SHADER);
-	checkForCompilerErrors(fragmentShaderProgram);
+	fragmentShaderProgram = LoadShaderFromFile(fsPath, FRAGMENT_SHADER);
+	CheckForCompilerErrors(fragmentShaderProgram);
 
 	shaderProgram = glCreateProgram();
 	glAttachShader(shaderProgram, vertexShaderProgram);
@@ -23,7 +28,7 @@ Material::Material(std::string vsPath, std::string fsPath)
 	glBindAttribLocation(shaderProgram, 2, "vertexTexCoords");
 
 	glLinkProgram(shaderProgram);
-	checkForLinkErrors(shaderProgram);
+	CheckForLinkErrors(shaderProgram);
 	//now we can delete the VS & FS Programs
 	glDeleteShader(vertexShaderProgram);
 	glDeleteShader(fragmentShaderProgram);
@@ -37,7 +42,7 @@ void Material::LoadTexture(std::string filename)
 {
 	std::cout << "Loading " + filename << std::endl;
 	//load texture & bind
-	diffuseMap = loadTextureFromFile(filename);
+	diffuseMap = LoadTextureFromFile(filename);
 
 	glBindTexture(GL_TEXTURE_2D, diffuseMap);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -54,4 +59,146 @@ GLuint Material::GetTexture()
 GLuint Material::GetShader()
 {
 	return shaderProgram;
+}
+
+//PRIVATE
+
+// Load it from a memory buffer
+GLuint Material::LoadShaderFromMemory(const char * pMem, SHADER_TYPE shaderType)
+{
+	GLuint program = glCreateShader(shaderType);
+	glShaderSource(program, 1, &pMem, NULL);
+	glCompileShader(program);
+	return program;
+}
+
+//Load Shader from File
+GLuint Material::LoadShaderFromFile(const std::string& filename, SHADER_TYPE shaderType)
+{
+	std::string fileContents;
+	std::ifstream file;
+	file.open(filename.c_str(), std::ios::in);
+	if (!file)
+	{
+		std::cout << "Shader file could not be loaded" << std::endl;
+		return 0;
+	}
+
+	//calculate file size
+	if (file.good())
+	{
+		file.seekg(0, std::ios::end);
+		unsigned long len = file.tellg();
+		file.seekg(std::ios::beg);
+		if (len == 0)
+		{
+			std::cout << "Shader file has no contents " << std::endl;
+			return 0;
+		}
+
+		fileContents.resize(len);
+		file.read(&fileContents[0], len);
+		file.close();
+		GLuint program = LoadShaderFromMemory(fileContents.c_str(), shaderType);
+		return program;
+	}
+	return 0;
+}
+
+bool Material::CheckForCompilerErrors(GLuint shaderProgram)
+{
+	GLint isCompiled = 0;
+	glGetShaderiv(shaderProgram, GL_COMPILE_STATUS, &isCompiled);
+	if (isCompiled == GL_FALSE)
+	{
+		GLint maxLength = 0;
+		glGetShaderiv(shaderProgram, GL_INFO_LOG_LENGTH, &maxLength);
+		//The maxLength includes the NULL character
+		std::string infoLog;
+		infoLog.resize(maxLength);
+		glGetShaderInfoLog(shaderProgram, maxLength, &maxLength, &infoLog[0]);
+		std::cout << "Shader not compiled " << infoLog << std::endl;
+		//We don't need the shader anymore.
+		glDeleteShader(shaderProgram);
+		return true;
+	}
+
+	return false;
+}
+
+bool Material::CheckForLinkErrors(GLuint program)
+{
+	GLint isLinked = 0;
+	glGetProgramiv(program, GL_LINK_STATUS, &isLinked);
+	if (isLinked == GL_FALSE) {
+		GLint maxLength = 0;
+		glGetProgramiv(program, GL_INFO_LOG_LENGTH, &maxLength);
+		//The maxLength includes the NULL character
+		std::string infoLog;
+		glGetProgramInfoLog(program, maxLength, &maxLength, &infoLog[0]);
+		std::cout << "Shader not linked " << infoLog << std::endl;
+		//We don't need the shader anymore.
+		glDeleteProgram(program);
+		return true;
+	}
+	return false;
+}
+
+GLuint Material::LoadTextureFromFile(const std::string&	filename)
+{
+	SDL_Surface	*imageSurface = IMG_Load(filename.c_str());
+	if (!imageSurface){
+
+		std::cout << "Can't Load	image " << filename << " " << IMG_GetError();
+		return	0;
+	}
+
+	GLuint textureID = ConvertSDLSurfaceToTexture(imageSurface);
+	SDL_FreeSurface(imageSurface);
+
+	return textureID;
+}
+
+GLuint Material::ConvertSDLSurfaceToTexture(SDL_Surface * surface)
+{
+	GLuint textureID = 0;
+	GLint		nOfColors = surface->format->BytesPerPixel;
+
+	GLenum	textureFormat = GL_RGB;
+	GLenum	internalFormat = GL_RGB8;
+
+	if (nOfColors == 4)					//	contains	an	alpha	channel
+	{
+		if (surface->format->Rmask == 0x000000ff){
+			textureFormat = GL_RGBA;
+			internalFormat = GL_RGBA8;
+		}
+		else
+		{
+			textureFormat = GL_BGRA;
+			internalFormat = GL_RGBA8;
+		}
+	}
+	else if (nOfColors == 3)					//	no	alpha	channel
+	{
+		if (surface->format->Rmask == 0x000000ff){
+			textureFormat = GL_RGB;
+			internalFormat = GL_RGB8;
+		}
+		else
+		{
+			textureFormat = GL_BGR;
+			internalFormat = GL_RGB8;
+		}
+	}
+	else
+	{
+		std::cout << "warning: the image is not truecolor.. this will	probably break";
+		return 0;
+	}
+	glGenTextures(1, &textureID);
+	glBindTexture(GL_TEXTURE_2D, textureID);
+	glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, surface->w, surface->h, 0, textureFormat, GL_UNSIGNED_BYTE, surface->pixels);
+
+	return textureID;
 }
