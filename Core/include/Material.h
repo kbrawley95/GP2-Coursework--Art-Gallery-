@@ -22,6 +22,7 @@ public:
 
 	void CalculateLighting(shared_ptr<Light> light);
 	void SetMainTexture(const string& filename);
+	void SetCubeMapTextures(const string& posX, const string& negX, const string& posY, const string& negY, const string& posZ, const string& negZ);
 
 	vec4& GetAmbientMaterial()
 	{
@@ -40,11 +41,16 @@ public:
 		return diffuseMap;
 	}; 
 
+
+
+		 
+
 private:
 	vec4 ambientMaterial;
 	vec4 diffuseMaterial;
 	vec4 specularMaterial;
 	GLuint diffuseMap;
+	GLuint environmentMap;
 
 };
 

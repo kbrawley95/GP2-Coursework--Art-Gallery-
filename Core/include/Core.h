@@ -26,6 +26,7 @@ private:
 	int currentTime;
 
 	void Render();
+	void RenderCubeMap();
 	void Update();
 	void Input(SDL_Event* e);
 };

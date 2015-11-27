@@ -114,6 +114,22 @@ Core::~Core()
 
 void Core::Start()
 {
+
+	//Skybox Initialisation
+	shared_ptr<GameObject>skybox = shared_ptr<GameObject>(new GameObject());
+	
+	const string skyboxFront = ASSET_PATH + TEXTURE_PATH + "";
+	const string skyboxBack = ASSET_PATH + TEXTURE_PATH + "";
+	const string skyboxLeft = ASSET_PATH + TEXTURE_PATH + "";
+	const string skyboxRight = ASSET_PATH + TEXTURE_PATH + "";
+	const string skyboxTop = ASSET_PATH + TEXTURE_PATH + "";
+	const string skyboxBottom = ASSET_PATH + TEXTURE_PATH + "";
+
+	shared_ptr<Material> skyboxMaterial = shared_ptr<Material>(new Material());
+	skybox->AddComponent(skyboxMaterial);
+
+
+
 	for (auto i = GameObjects.begin(); i != GameObjects.end(); ++i)
 	{
 		(*i)->Start();
@@ -177,4 +193,7 @@ void Core::Render()
 	{
 		(*i)->Render();
 	}
+
+
 }
+

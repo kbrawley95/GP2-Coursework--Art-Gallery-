@@ -11,6 +11,20 @@ int main(int argc, char *argv[])
 {
 	Core* engine = new Core(800, 600);
 
+	//Skybox Initialisation
+	shared_ptr<GameObject>skybox = shared_ptr<GameObject>(new GameObject());
+
+	const string skyboxFront = ASSET_PATH + TEXTURE_PATH + "";
+	const string skyboxBack = ASSET_PATH + TEXTURE_PATH + "";
+	const string skyboxLeft = ASSET_PATH + TEXTURE_PATH + "";
+	const string skyboxRight = ASSET_PATH + TEXTURE_PATH + "";
+	const string skyboxTop = ASSET_PATH + TEXTURE_PATH + "";
+	const string skyboxBottom = ASSET_PATH + TEXTURE_PATH + "";
+
+	shared_ptr<Material> skyboxMaterial = shared_ptr<Material>(new Material());
+	skyboxMaterial->SetCubeMapTextures(skyboxFront, skyboxBack, skyboxLeft, skyboxRight, skyboxTop, skyboxBottom);
+	
+
 	//Create Camera
 	MainCamera = shared_ptr<GameObject>(new GameObject("Main Camera"));
 	MainCamera->transform.position = Vector3(0, 0, 0);

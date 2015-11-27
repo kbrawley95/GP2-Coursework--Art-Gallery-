@@ -36,15 +36,19 @@ void Camera::Input(SDL_Event* e)
 		switch (e->key.keysym.sym)
 		{
 		case SDLK_a:
+			cout << gameObject->transform.position.x << endl;
 			gameObject->transform.position.x -= 2.0f * deltaTime;
 			break;
 		case SDLK_d:
+			cout << gameObject->transform.position.x << endl;
 			gameObject->transform.position.x += 2.0f * deltaTime;
 			break;
 		case SDLK_w:
+			cout << gameObject->transform.position.z << endl;
 			gameObject->transform.position.z += 2.0f * deltaTime;
 			break;
 		case SDLK_s:
+			cout << gameObject->transform.position.z << endl;
 			gameObject->transform.position.z -= 2.0f * deltaTime;
 			break;
 		}

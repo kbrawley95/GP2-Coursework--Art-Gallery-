@@ -33,6 +33,32 @@ GLuint	LoadTextureFromFont(const string& fontFilename, int	pointSize, const stri
 	return textureID;
 }
 
+GLuint LoadCubemapTexture(const string& posX, const string& negX, const string& posY, const string& negY, const string& posZ, const string& negZ)
+{
+	GLuint textureObj;
+
+	glActiveTexture(GL_TEXTURE1);
+	glGenTextures(1, &textureObj);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, textureObj);
+
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_GENERATE_MIPMAP, GL_TRUE);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+
+	LoadCubeMapFace(posX, GL_TEXTURE_CUBE_MAP_POSITIVE_X);
+	LoadCubeMapFace(negY, GL_TEXTURE_CUBE_MAP_POSITIVE_X);
+	LoadCubeMapFace(posY, GL_TEXTURE_CUBE_MAP_POSITIVE_X);
+	LoadCubeMapFace(negY, GL_TEXTURE_CUBE_MAP_POSITIVE_X);
+	LoadCubeMapFace(posZ, GL_TEXTURE_CUBE_MAP_POSITIVE_X);
+	LoadCubeMapFace(negZ, GL_TEXTURE_CUBE_MAP_POSITIVE_X);
+
+	return textureObj;
+	
+}
+
 GLuint ConvertSDLSurfaceToTexture(SDL_Surface * surface)
 {
 	GLuint textureID = 0;
@@ -75,4 +101,16 @@ GLuint ConvertSDLSurfaceToTexture(SDL_Surface * surface)
 		GL_UNSIGNED_BYTE, surface->pixels);
 
 	return textureID;
+}
+
+void LoadCubeMapFace(const string& filename, GLenum face)
+{
+	SDL_Surface* imageSurface = IMG_Load(filename.c_str());
+
+	GLenum textureFormat=GL_RGB;
+	GLenum internalFormat=GL_RGB8;
+	
+	glTexImage2D(face, 0, internalFormat, imageSurface->w, imageSurface->h, 0, textureFormat, GL_UNSIGNED_BYTE, imageSurface->pixels);
+	
+	SDL_FreeSurface(imageSurface);
 }

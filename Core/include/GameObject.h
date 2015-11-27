@@ -5,6 +5,7 @@
 #include "Component.h"
 #include "Transform.h"
 #include "Scene.h"
+#include "Texture.h"
 
 class GameObject : public enable_shared_from_this<GameObject>
 {
@@ -19,7 +20,7 @@ public:
 	GameObject(string name)
 	{
 		GameObject::name = name;
-	}
+	}	
 
 	mat4 GetModelMatrix()
 	{

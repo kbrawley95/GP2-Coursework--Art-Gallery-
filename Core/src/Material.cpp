@@ -55,3 +55,9 @@ void Material::SetMainTexture(const string& filename)
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 	glGenerateMipmap(GL_TEXTURE_2D);
 }
+
+void Material::SetCubeMapTextures(const string& posX, const string& negX, const string& posY, const string& negY, const string& posZ, const string& negZ)
+{
+	environmentMap = LoadCubemapTexture(posX, negX, posY, negY, posZ, negZ);
+
+}
