@@ -1,12 +1,13 @@
 #ifndef _SCENE_H
 #define _SCENE_H
 
-#include "Common.h"
-#include "GameObject.h"
+#include <map>
 
-extern float deltaTime;
-extern shared_ptr<GameObject> MainCamera;
-extern shared_ptr<GameObject> MainLight;
-extern vector<shared_ptr<GameObject>> GameObjects;
+class Camera;
+class GameObject;
+class Light;
 
+extern std::shared_ptr<Camera> MainCamera;
+extern std::shared_ptr<Light> MainLight;
+extern std::vector<std::shared_ptr<GameObject>> GameObjects;
 #endif

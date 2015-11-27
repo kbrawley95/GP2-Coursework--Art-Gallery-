@@ -13,14 +13,14 @@ struct Vector2
 		return{ x + a.x, y + a.y };
 	}
 
-	Vector2 operator=(vec2 a)
+	Vector2 operator=(glm::vec2 a)
 	{
 		return{ a.x, a.y };
 	}
 
-	vec2 ConvertToVec2()
+	glm::vec2 ConvertToVec2()
 	{
-		return vec2(x, y);
+		return glm::vec2(x, y);
 	}
 };
 
@@ -49,14 +49,14 @@ struct Vector3
 		return{ x + a.x, y + a.y, z + a.z };
 	}
 
-	Vector3 operator=(vec3 a)
+	Vector3 operator=(glm::vec3 a)
 	{
 		return{ a.x, a.y, a.z };
 	}
 
-	vec3 ConvertToVec3()
+	glm::vec3 ConvertToVec3()
 	{
-		return vec3(x, y, z);
+		return glm::vec3(x, y, z);
 	}
 };
 

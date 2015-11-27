@@ -2,39 +2,34 @@
 #define _MESH_H
 
 #include "Common.h"
+#include "Material.h"
 #include "Vertex.h"
 #include "Component.h"
-#include "GameObject.h"
-#include "Material.h"
-#include "Scene.h"
-#include "Camera.h"
 
 class Mesh : public Component
 {
 public:
-	shared_ptr<Material> material;
-	vector<Vertex> vertices;
-	vector<int> indices;
+	std::vector<Vertex> vertices;
+	std::vector<int> indices;
+	std::shared_ptr<Material> material = nullptr;
 
-	Mesh(shared_ptr<GameObject> g);
-	~Mesh();
-
-	void Render();
-	void GenerateBuffers();
-
-	void SetMaterial(shared_ptr<Material> mat)
-	{
-		material = mat;
-	}
-	shared_ptr<Material> GetMaterial()
-	{
-		return material;
-	}
-
-private:
 	GLuint VBO;
 	GLuint EBO;
 	GLuint VAO;
+
+	bool LoadFBX(std::string filename);
+	void GenerateBuffers();
+
+	Mesh();
+	~Mesh();
+	
+private:
+
+	FbxString GetAttributeTypeName(FbxNodeAttribute::EType type);
+	void ProcessNode(FbxNode* node);
+	void ProcessAttribute(FbxNodeAttribute* attribute);
+	void ProcessMesh(FbxMesh* mesh);
+	void ProcessMeshTextureCoords(FbxMesh* mesh, Vertex* verts, int numVerts);
 };
 
 #endif

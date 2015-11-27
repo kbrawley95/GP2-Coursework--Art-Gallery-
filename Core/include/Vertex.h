@@ -1,15 +1,13 @@
-#ifndef _VERTEX_H
-#define _VERTEX_H
+#ifndef _VERTICES_H
+#define _VERTICES_H
 
 #include "Common.h"
 
 struct Vertex
 {
-	vec3 position;
-	vec4 colour;
-	vec2 texCoords;
-	vec3 normal;
-
+	glm::vec3 position;
+	glm::vec4 colour;
+	glm::vec2 texCoords;
 };
 
 #endif

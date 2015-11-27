@@ -1,58 +1,24 @@
 #ifndef _MATERIAL_H
 #define _MATERIAL_H
 
-#include"Common.h"
-#include "Component.h"
-#include "Shader.h"
-#include "Light.h"
-#include "Texture.h"
+#include "Common.h"
+#include "ShaderLoader.h"
+#include "TextureLoader.h"
 
 class Material
 {
 public:
-
-	shared_ptr<Shader> shader;
-	//Use Defuse shader by default
-	Material();
-	Material(shared_ptr<Shader> s);
-	Material(string vs, string fs);
-
-	//Memory cleanup
+	//Loads a default shader
+	Material(std::string vsPath, std::string fsPath);
 	~Material();
+	void LoadTexture(std::string filename);
 
-	void CalculateLighting(shared_ptr<Light> light);
-	void SetMainTexture(const string& filename);
-	void SetCubeMapTextures(const string& posX, const string& negX, const string& posY, const string& negY, const string& posZ, const string& negZ);
-
-	vec4& GetAmbientMaterial()
-	{
-		return ambientMaterial;
-	};
-	vec4& GetDiffuseMaterial()
-	{
-		return diffuseMaterial;
-	};
-	vec4& GetSpecularMaterial()
-	{
-		return specularMaterial;
-	};
-	GLuint& GetDiffuseMap()
-	{
-		return diffuseMap;
-	}; 
-
-
-
-		 
+	GLuint GetTexture();
+	GLuint GetShader();
 
 private:
-	vec4 ambientMaterial;
-	vec4 diffuseMaterial;
-	vec4 specularMaterial;
+	GLuint shaderProgram;
 	GLuint diffuseMap;
-	GLuint environmentMap;
-
 };
-
 
 #endif

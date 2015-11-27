@@ -1,63 +1,57 @@
 #include "Material.h"
 
-Material::Material()
+Material::Material(std::string vsPath, std::string fsPath)
 {
-	//Compile Shader
-	shader = shared_ptr<Shader>(new Shader("simpleColourVS.glsl", "simpleColourFS.glsl"));
-}
+	std::cout << "Loading " << std::endl;
+	std::cout << "-" << vsPath << std::endl;
+	std::cout << "-" << fsPath << std::endl << std::endl;
+	GLuint vertexShaderProgram = 0;
+	vertexShaderProgram = loadShaderFromFile(vsPath, VERTEX_SHADER);
+	checkForCompilerErrors(vertexShaderProgram);
 
-Material::Material(string vs, string fs)
-{
-	//Compile Shader
-	shader = shared_ptr<Shader>(new Shader(vs, fs));
-}
-Material::Material(shared_ptr<Shader> s)
-{
-	shader = s;
-}
+	GLuint fragmentShaderProgram = 0;
+	fragmentShaderProgram = loadShaderFromFile(fsPath, FRAGMENT_SHADER);
+	checkForCompilerErrors(fragmentShaderProgram);
 
+	shaderProgram = glCreateProgram();
+	glAttachShader(shaderProgram, vertexShaderProgram);
+	glAttachShader(shaderProgram, fragmentShaderProgram);
+
+	//Link attributes
+	glBindAttribLocation(shaderProgram, 0, "vertexPosition");
+	glBindAttribLocation(shaderProgram, 1, "vertexColour");
+	glBindAttribLocation(shaderProgram, 2, "vertexTexCoords");
+
+	glLinkProgram(shaderProgram);
+	checkForLinkErrors(shaderProgram);
+	//now we can delete the VS & FS Programs
+	glDeleteShader(vertexShaderProgram);
+	glDeleteShader(fragmentShaderProgram);
+}
 Material::~Material()
 {
-	glDeleteTextures(1, &diffuseMap);
+
 }
 
-void Material::CalculateLighting(shared_ptr<Light> light)
+void Material::LoadTexture(std::string filename)
 {
-	GLint ambientLightColourLocation = glGetUniformLocation(shader->currentShaderProgram, "ambientLightColour");
-	GLint ambientMaterialColourLocation = glGetUniformLocation(shader->currentShaderProgram, "ambientMaterialColour");
+	std::cout << "Loading " + filename << std::endl;
+	//load texture & bind
+	diffuseMap = loadTextureFromFile(filename);
 
-	GLint diffuseLightColourLocation = glGetUniformLocation(shader->currentShaderProgram, "diffuseLightColour");
-	GLint diffuseLightMaterialLocation = glGetUniformLocation(shader->currentShaderProgram, "diffuseMaterialColour");
-	GLint lightDirectionLocation = glGetUniformLocation(shader->currentShaderProgram, "lightDirection");
-
-	GLint specularLightColourLocation = glGetUniformLocation(shader->currentShaderProgram, "specularLightColour");
-	GLint specularLightMaterialLocation = glGetUniformLocation(shader->currentShaderProgram, "specularMaterialColour");
-	GLint specularPowerLocation = glGetUniformLocation(shader->currentShaderProgram, "specularPower");
-
-	glUniform4fv(ambientLightColourLocation, 1, value_ptr(light->GetAmbientLightColour()));
-	glUniform4fv(ambientMaterialColourLocation, 1, value_ptr(GetAmbientMaterial()));
-
-	glUniform4fv(diffuseLightColourLocation, 1, value_ptr(light->GetDiffuseLightColour()));
-	glUniform4fv(diffuseLightMaterialLocation, 1, value_ptr(GetDiffuseMaterial()));
-	glUniform3fv(lightDirectionLocation, 1, value_ptr(light->GetLightDirection()));
-
-	glUniform4fv(specularLightColourLocation, 1, value_ptr(light->GetSpecularLightColour()));
-	glUniform4fv(specularLightMaterialLocation, 1, value_ptr(GetSpecularMaterial()));
-	glUniform1f(specularPowerLocation, light->GetSpecularPower());
-}
-
-void Material::SetMainTexture(const string& filename)
-{
-	diffuseMap = LoadTextureFromFile(filename);
+	glBindTexture(GL_TEXTURE_2D, diffuseMap);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
 	glGenerateMipmap(GL_TEXTURE_2D);
 }
 
-void Material::SetCubeMapTextures(const string& posX, const string& negX, const string& posY, const string& negY, const string& posZ, const string& negZ)
+GLuint Material::GetTexture()
 {
-	environmentMap = LoadCubemapTexture(posX, negX, posY, negY, posZ, negZ);
-
+	return diffuseMap;
+}
+GLuint Material::GetShader()
+{
+	return shaderProgram;
 }

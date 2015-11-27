@@ -3,32 +3,26 @@
 
 #include "Common.h"
 #include "GameObject.h"
-#include "Component.h"
+#include "Camera.h"
 #include "Scene.h"
-#include "Mesh.h"
-#include "FBXLoader.h"
+#include "TextureLoader.h"
 
 class Core
 {
 public:
-	int width;
-	int height;
-
+	int WIDTH;
+	int HEIGHT;
 	Core(int width, int height);
 	~Core();
 
 	void Start();
+	void Input(SDL_Event* e);
+	void Update();
+	void Render();
 
 private:
 	SDL_Window* window;
-	SDL_GLContext glContext;
-	int previousTime;
-	int currentTime;
-
-	void Render();
-	void RenderCubeMap();
-	void Update();
-	void Input(SDL_Event* e);
+	SDL_GLContext context;
 };
 
 #endif

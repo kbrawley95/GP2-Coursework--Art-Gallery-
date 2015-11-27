@@ -2,165 +2,121 @@
 
 Core::Core(int width, int height)
 {
-	cout << "Starting up" << endl;
-	//Set width and height for the window
-	Core::width = width;
-	Core::height = height;
+	WIDTH = width;
+	HEIGHT = height;
 
-	//Change working directory
-#ifdef _WIN32
-	char buffer[MAX_PATH];
-	GetModuleFileName(NULL, buffer, MAX_PATH);
-	//move into a string(just makes it easier
-	string exeFullFilename(buffer);
-	cout << "Exe Path & Filename " << exeFullFilename << endl;
-	//now stripout the exe
-	string exeDirectory = exeFullFilename.substr(0, exeFullFilename.find_last_of("\\"));
-	cout << "Exe Directory " << exeDirectory << endl;
-	SetCurrentDirectory(exeDirectory.c_str());
-#endif
-	cout << "Working directory changed" << endl;
-
-	// init everyting - SDL, if it is nonzero we have a problem
+	//SDL
 	if (SDL_Init(SDL_INIT_EVERYTHING) != 0)
 	{
 		std::cout << "ERROR SDL_Init " << SDL_GetError() << std::endl;
 		return;
 	}
+	std::cout << "SDL Initilized" << std::endl;
 
-	cout << "SDL initialised" << endl;
-
-	//Init SDL_Image
-	int	imageInitFlags = IMG_INIT_JPG | IMG_INIT_PNG;
-	int	returnInitFlags = IMG_Init(imageInitFlags);
-	if (((returnInitFlags)&	(imageInitFlags)) != imageInitFlags)	{
-
-		cout << "ERROR	SDL_Image	Init	" << IMG_GetError() << endl;
+	//SDL_Image
+	int imageInitFlags = IMG_INIT_JPG | IMG_INIT_PNG;
+	int returnInitFlags = IMG_Init(imageInitFlags);
+	if ((returnInitFlags & imageInitFlags) != imageInitFlags)
+	{
+		std::cout << "ERROR SDL_Image " << IMG_GetError() << std::endl;
+		return;
 	}
+	std::cout << "SDL_Image Initilized" << std::endl;
 
-	if (TTF_Init() == -1)	{
-		std::cout << "ERROR	TTF_Init:	" << TTF_GetError();
-	}
-
-	cout << "SDL_Image initialised" << endl;
-
-	// Request opengl 4.1 context, Core Context
+	//Request Open GL 4.1
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1);
+	std::cout << "Open GL version set to 4.1" << std::endl;
 
-	cout << "Open GL version set to 4.1" << endl;
-
-	//Create a window
+	//Create Window
 	window = SDL_CreateWindow(
-		"SDL",             // window title
-		SDL_WINDOWPOS_CENTERED,     // x position, centered
-		SDL_WINDOWPOS_CENTERED,     // y position, centered
-		640,                        // width, in pixels
-		480,                        // height, in pixels
-		SDL_WINDOW_OPENGL           // flags
+		"Core Engine",               // window title
+		SDL_WINDOWPOS_CENTERED,      // x position, centered
+		SDL_WINDOWPOS_CENTERED,      // y position, centered
+		WIDTH,                       // width, in pixels
+		HEIGHT,                      // height, in pixels
+		SDL_WINDOW_OPENGL            // flags
 		);
 
-	// Create an OpenGL context associated with the window.
-	glContext = SDL_GL_CreateContext(window);
+	//Create Context
+	context = SDL_GL_CreateContext(window);
+	std::cout << "Window & Context Initilized" << std::endl;
 
-	cout << "SDL window created" << endl;
-
+	//Setup Open GL
 	glewExperimental = GL_TRUE;
 	GLenum err = glewInit();
-	if (GLEW_OK != err)
+	if (err != GLEW_OK)
 	{
-		//Problem: glewInit failed, something is seriously wrong.
-		std::cout << "Error: " << glewGetErrorString(err) << std::endl;
+		std::cout << "GLEW Error " << glewGetErrorString(err) << std::endl;
+		return;
 	}
+	std::cout << "GLEW Initilized" << std::endl;
 
-	cout << "GLEW initalised" << endl;
-
-	// Smooth shading
+	//Smooth shading
 	glShadeModel(GL_SMOOTH);
-
-	//clear the background to black
+	
+	//Set clear color to black
 	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 
-	//Clear the depth buffer
+	//Clear depth buffer
 	glClearDepth(1.0f);
 
 	//Enable depth testing
 	glEnable(GL_DEPTH_TEST);
 
-	//The depth test to go
+	//the depth test to go
 	glDepthFunc(GL_LEQUAL);
 
-	//Turn on best perspective correction
+	//Turn on the best perspective correction
 	glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
 
-	cout << "Open GL setup complete" << endl;
+	//setup viewport
+	glViewport(0, 0, (GLsizei)WIDTH, (GLsizei)HEIGHT);
 
-	//Set our viewport
-	glViewport(0, 0, (GLsizei)width, (GLsizei)height);
-	cout << "Viewport setup complete" << endl;
+	std::cout << "Open GL setup complete." << std::endl;
+
+	//Change working directory
+	std::cout << "Changing working directory" << std::endl << std::endl;
+#ifdef _WIN32
+	char buffer[MAX_PATH];
+	GetModuleFileName(NULL, buffer, MAX_PATH);
+	std::string exeFullFilename = std::string(buffer);
+	std::string exeDirectory = exeFullFilename.substr(0, exeFullFilename.find_last_of("\\"));
+	SetCurrentDirectory(exeDirectory.c_str());
+#endif
 }
 
 Core::~Core()
 {
-	cout << "Cleaning up" << endl;
-	// clean up, reverse order!!!
-	SDL_GL_DeleteContext(glContext);
+	SDL_GL_DeleteContext(context);
 	SDL_DestroyWindow(window);
-	IMG_Quit();
-	TTF_Quit();
 	SDL_Quit();
 }
 
 void Core::Start()
 {
-
-	//Skybox Initialisation
-	shared_ptr<GameObject>skybox = shared_ptr<GameObject>(new GameObject());
-	
-	const string skyboxFront = ASSET_PATH + TEXTURE_PATH + "";
-	const string skyboxBack = ASSET_PATH + TEXTURE_PATH + "";
-	const string skyboxLeft = ASSET_PATH + TEXTURE_PATH + "";
-	const string skyboxRight = ASSET_PATH + TEXTURE_PATH + "";
-	const string skyboxTop = ASSET_PATH + TEXTURE_PATH + "";
-	const string skyboxBottom = ASSET_PATH + TEXTURE_PATH + "";
-
-	shared_ptr<Material> skyboxMaterial = shared_ptr<Material>(new Material());
-	skybox->AddComponent(skyboxMaterial);
-
-
+	std::cout << std::endl << "[Main Loop Started]" << std::endl;
 
 	for (auto i = GameObjects.begin(); i != GameObjects.end(); ++i)
-	{
-		(*i)->Start();
-	}
-	cout << "Game Main Loop Started" << endl;
-	//Value to hold the event generated by SDL
-	SDL_Event event;
-	//Game Loop
-	bool run = true; while (run)
-	{
-		previousTime = currentTime;
-		currentTime = SDL_GetTicks();
-		deltaTime = (currentTime - previousTime) / 1000.0f;
+		for (std::shared_ptr<Component> j : (*i)->GetComponents())
+			j->Start();
 
-		//While we still have events in the queue
-		while (SDL_PollEvent(&event))
+	SDL_Event events;
+	bool run = true;
+	while (run)
+	{
+		while (SDL_PollEvent(&events))
 		{
-			//Get event type
-			if (event.type == SDL_QUIT || event.type == SDL_WINDOWEVENT_CLOSE)
-			{
-				//set our boolean which controls the loop to false
+			if (events.type == SDL_QUIT || events.type == SDL_WINDOWEVENT_CLOSE)
 				run = false;
-			}
-
-			Input(&event);
+			Input(&events);
 		}
-		//init Scene
+
 		Update();
-		//render
+
 		Render();
-		//Call swap so that our GL back buffer is displayed
+
 		SDL_GL_SwapWindow(window);
 	}
 }
@@ -168,32 +124,51 @@ void Core::Start()
 void Core::Input(SDL_Event* e)
 {
 	for (auto i = GameObjects.begin(); i != GameObjects.end(); ++i)
-	{
-		(*i)->Input(e);
-	}
+		for (std::shared_ptr<Component> j : (*i)->GetComponents())
+			j->Input(e);
 }
 
 void Core::Update()
 {
 	for (auto i = GameObjects.begin(); i != GameObjects.end(); ++i)
-	{
-		(*i)->Update();
-	}
+		for (std::shared_ptr<Component> j : (*i)->GetComponents())
+			j->Update();
+
+	MainCamera->Update();
 }
 
 void Core::Render()
 {
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-	//Set the clear colour(background)
-	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-	//clear the colour and depth buffer
+	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	for (auto i = GameObjects.begin(); i != GameObjects.end(); ++i)
 	{
-		(*i)->Render();
+		for (std::shared_ptr<Component> j : (*i)->GetComponents())
+			j->PostRender();
+
+		std::shared_ptr<Mesh> m = (*i)->GetComponent<Mesh>();
+		if (m != nullptr)
+		{
+			glUseProgram(m->material->GetShader());
+
+			GLint MVPLocation = glGetUniformLocation(m->material->GetShader(), "MVP");
+			GLint texture0Location = glGetUniformLocation(m->material->GetShader(), "texture0");
+
+			glActiveTexture(GL_TEXTURE0);
+			glBindTexture(GL_TEXTURE_2D, m->material->GetTexture());
+
+			glUniformMatrix4fv(MVPLocation, 1, GL_FALSE, glm::value_ptr((*i)->GetMVPMatrix()));
+			glUniform1i(texture0Location, 0);
+
+			glBindVertexArray(m->VAO);
+			glBindBuffer(GL_ARRAY_BUFFER, m->VBO);
+			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m->EBO);
+
+			glDrawElements(GL_TRIANGLES, m->indices.size(), GL_UNSIGNED_INT, 0);
+		}
+
+		for (std::shared_ptr<Component> j : (*i)->GetComponents())
+			j->PostRender();
 	}
-
-
 }
-

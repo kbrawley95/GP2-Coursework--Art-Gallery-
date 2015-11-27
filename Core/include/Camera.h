@@ -2,31 +2,49 @@
 #define _CAMERA_H
 
 #include "Common.h"
-#include "Component.h"
-#include "GameObject.h"
 #include "Transform.h"
-#include "Scene.h"
 
-class Camera : public Component
+class Camera
 {
 public:
-	mat4 viewMatrix;
-	mat4 projMatrix;
-
+	Transform transform;
 	float fov;
-	float aspect;
+	float aspectRatio;
 	float zNear;
 	float zFar;
 
-	void Update();
-	void Input(SDL_Event* e);
+	void Update()
+	{
 
-	Camera(shared_ptr<GameObject> g);
-	~Camera();
+	}
 
+	Camera()
+	{
+		fov = 45.0f;
+		aspectRatio = 800/ 600;
+		zNear = 0.1f;
+		zFar = 1000.0f;
+		forward = glm::vec3(0.0f, 0.0f, 1.0f);
+		up = glm::vec3(0.0f, 1.0f, 0.0f);
+		transform = Transform();
+	}
+	~Camera()
+	{
+
+	}
+
+	glm::mat4 GetViewMatrix()
+	{
+		return glm::lookAt(transform.position.ConvertToVec3(), transform.position.ConvertToVec3() + forward, up);
+	}
+
+	glm::mat4 GetProjectionMatrix()
+	{
+		return glm::perspective(fov, aspectRatio, zNear, zFar);
+	}
 private:
-	vec3 forward;
-	vec3 up;
+	glm::vec3 forward;
+	glm::vec3 up;
 };
 
 #endif
