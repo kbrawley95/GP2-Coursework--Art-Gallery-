@@ -74,6 +74,24 @@ void Mesh::GenerateBuffers()
 	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void**)(sizeof(glm::vec3) + sizeof(glm::vec4)));
 }
 
+void Mesh::GenerateSkyBoxBuffers()
+{
+	if (material == nullptr)
+	{
+		std::cout << "No Material found. Using default material & texture" << std::endl;
+		material = std::shared_ptr<Material>(new Material(SHADER_PATH + "textureVS.glsl", SHADER_PATH + "textureFS.glsl"));
+		material->LoadTexture(TEXTURE_PATH + "default.png");
+	}
+
+	glDepthMask(GL_FALSE);
+	glGenVertexArrays(1, &skyboxVAO);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, std::shared_ptr<Material>(new Material(SHADER_PATH + "skyboxVS.glsl", SHADER_PATH+"skyboxFS.glsl"))->GetCubeMap());
+	glDrawArrays(GL_TRIANGLES, 0, 36);
+	glBindVertexArray(0);
+	glDepthMask(GL_TRUE);
+
+}
+
 Mesh::Mesh()
 {
 

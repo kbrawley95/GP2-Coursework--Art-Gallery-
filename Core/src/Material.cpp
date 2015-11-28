@@ -7,6 +7,8 @@ Material::Material(std::string vsPath, std::string fsPath)
 	specularMaterial = Vector4(1.0f, 1.0f, 1.0f, 1.0f);
 	specularPower = 25.0f;
 
+	environmentMap = 0;
+
 	std::cout << "Loading " << std::endl;
 	std::cout << "-" << vsPath << std::endl;
 	std::cout << "-" << fsPath << std::endl << std::endl;
@@ -70,9 +72,9 @@ GLuint Material::LoadCubemapTexture(const std::string& posX, const std::string& 
 	LoadCubeMapFace(posX, GL_TEXTURE_CUBE_MAP_POSITIVE_X);
 	LoadCubeMapFace(negX, GL_TEXTURE_CUBE_MAP_NEGATIVE_X);
 	LoadCubeMapFace(posY, GL_TEXTURE_CUBE_MAP_POSITIVE_Y);
-	LoadCubeMapFace(negX, GL_TEXTURE_CUBE_MAP_NEGATIVE_Y);
+	LoadCubeMapFace(negY, GL_TEXTURE_CUBE_MAP_NEGATIVE_Y);
 	LoadCubeMapFace(posZ, GL_TEXTURE_CUBE_MAP_POSITIVE_Z);
-	LoadCubeMapFace(negX, GL_TEXTURE_CUBE_MAP_NEGATIVE_Z);
+	LoadCubeMapFace(negZ, GL_TEXTURE_CUBE_MAP_NEGATIVE_Z);
 
 
 	return textureObj;
@@ -81,13 +83,54 @@ GLuint Material::LoadCubemapTexture(const std::string& posX, const std::string& 
 
 void Material::LoadCubeMapFace(const std::string& filename, GLenum face)
 {
-	SDL_Surface* imageSurface = IMG_Load(filename.c_str());
+	/*SDL_Surface* imageSurface = IMG_Load(filename.c_str());
 
 	GLenum	textureFormat = GL_RGB;
 	GLenum	internalFormat = GL_RGB8;
 
 
 	glTexImage2D(face, 0, internalFormat, imageSurface->w, imageSurface->h, 0, textureFormat, GL_UNSIGNED_BYTE, imageSurface->pixels);
+
+	SDL_FreeSurface(imageSurface);*/
+
+	SDL_Surface	*imageSurface = IMG_Load(filename.c_str());
+	if (!imageSurface){
+
+		std::cout << "Can't Load	image " << filename << " " << IMG_GetError();
+	}
+
+	GLint		nOfColors = imageSurface->format->BytesPerPixel;
+
+	GLenum	textureFormat = GL_RGB;
+	GLenum	internalFormat = GL_RGB8;
+
+	if (nOfColors == 4)					//	contains	an	alpha	channel
+	{
+		if (imageSurface->format->Rmask == 0x000000ff){
+			textureFormat = GL_RGBA;
+			internalFormat = GL_RGBA8;
+		}
+		else{
+			textureFormat = GL_BGRA;
+			internalFormat = GL_RGBA8;
+		}
+	}
+	else if (nOfColors == 3)					//	no	alpha	channel
+	{
+		if (imageSurface->format->Rmask == 0x000000ff){
+			textureFormat = GL_RGB;
+			internalFormat = GL_RGB8;
+		}
+		else{
+			textureFormat = GL_BGR;
+			internalFormat = GL_RGB8;
+		}
+	}
+	else{
+		std::cout << "warning: the image is not truecolor.. this will	probably break";
+	}
+	glTexImage2D(face, 0, internalFormat, imageSurface->w, imageSurface->h, 0, textureFormat,
+		GL_UNSIGNED_BYTE, imageSurface->pixels);
 
 	SDL_FreeSurface(imageSurface);
 }

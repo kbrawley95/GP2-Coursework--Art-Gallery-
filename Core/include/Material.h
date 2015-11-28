@@ -26,6 +26,11 @@ public:
 	GLuint GetTexture();
 	GLuint GetShader();
 
+	GLuint& GetCubeMap()
+	{
+		return environmentMap;
+	};
+
 private:
 	GLuint shaderProgram;
 	GLuint diffuseMap;

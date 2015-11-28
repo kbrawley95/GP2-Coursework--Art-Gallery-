@@ -39,15 +39,15 @@ int main(int argc, char *argv[])
 	skybox->transform.position = Vector3(20, 0, 0);
 	std::shared_ptr<Mesh> skyboxMesh = skybox->AddComponent<Mesh>();
 
-	const std::string skyboxFront = ASSET_PATH + TEXTURE_PATH + "ashcanyon_ft.png";
-	const std::string skyboxBack = ASSET_PATH + TEXTURE_PATH + "ashcanyon_bk.png";
-	const std::string skyboxLeft = ASSET_PATH + TEXTURE_PATH + "ashcanyon_lf.png";
-	const std::string skyboxRight = ASSET_PATH + TEXTURE_PATH + "ashcanyon_rt.png";
-	const std::string skyboxTop= ASSET_PATH + TEXTURE_PATH + "ashcanyon_up.png";
-	const std::string skyboxBottom = ASSET_PATH + TEXTURE_PATH + "ashcanyon_dn.png";
+	const std::string skyboxFront =  TEXTURE_PATH + "ashcanyon_ft.png";
+	const std::string skyboxBack = TEXTURE_PATH + "ashcanyon_bk.png";
+	const std::string skyboxLeft = TEXTURE_PATH + "ashcanyon_lf.png";
+	const std::string skyboxRight =  TEXTURE_PATH + "ashcanyon_rt.png";
+	const std::string skyboxTop= TEXTURE_PATH + "ashcanyon_up.png";
+	const std::string skyboxBottom = TEXTURE_PATH + "ashcanyon_dn.png";
 
 	skyboxMesh->material->SetCubeMapTextures(skyboxFront, skyboxBack, skyboxLeft, skyboxRight, skyboxTop, skyboxBottom);
-	skyboxMesh->GenerateBuffers();
+	skyboxMesh->GenerateSkyBoxBuffers();
 	GameObjects.push_back(skybox);
 
 	engine->Start();
