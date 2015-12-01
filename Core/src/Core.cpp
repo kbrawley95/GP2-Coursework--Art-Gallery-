@@ -155,6 +155,29 @@ void Core::Render()
 	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+	glDepthMask(GL_FALSE);
+	RenderSkyBox();
+	glDepthMask(GL_TRUE);
+
+	RenderGameObjects();
+}
+
+void Core::RenderSkyBox()
+{
+	std::shared_ptr<Mesh> m = std::shared_ptr<Mesh>(new Mesh());
+
+	GLint cubeTextureLocal = glGetUniformLocation(m->material->GetShader(), "cubeTexture");
+
+	glUniform1i(cubeTextureLocal, 1);
+	glGenVertexArrays(1, &m->skyboxVAO);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, std::shared_ptr<Material>(new Material(SHADER_PATH + "skyVS.glsl", SHADER_PATH + "skyFS.glsl"))->GetCubeMap());
+	glDrawArrays(GL_TRIANGLES, 0, 36);
+	glBindVertexArray(0);
+}
+
+void Core::RenderGameObjects()
+{
+	
 	for (auto i = GameObjects.begin(); i != GameObjects.end(); ++i)
 	{
 		for (std::shared_ptr<Component> j : (*i)->GetComponents())
@@ -168,11 +191,14 @@ void Core::Render()
 			GLint MVPLocation = glGetUniformLocation(m->material->GetShader(), "MVP");
 			GLint texture0Location = glGetUniformLocation(m->material->GetShader(), "texture0");
 
+
 			glActiveTexture(GL_TEXTURE0);
 			glBindTexture(GL_TEXTURE_2D, m->material->GetTexture());
 
 			glUniformMatrix4fv(MVPLocation, 1, GL_FALSE, glm::value_ptr((*i)->GetMVPMatrix()));
 			glUniform1i(texture0Location, 0);
+
+
 
 			if (lighting)
 			{
@@ -186,6 +212,7 @@ void Core::Render()
 				GLint specularLightColourLocation = glGetUniformLocation(m->material->GetShader(), "specularLightColour");
 				GLint specularLightMaterialLocation = glGetUniformLocation(m->material->GetShader(), "specularMaterialColour");
 				GLint specularPowerLocation = glGetUniformLocation(m->material->GetShader(), "specularPower");
+
 
 				glUniform4fv(ambientLightColourLocation, 1, value_ptr(MainLight->ambientLightColor.ConvertToVec4()));
 				glUniform4fv(ambientMaterialColourLocation, 1, value_ptr(m->material->ambientMaterial.ConvertToVec4()));
@@ -206,7 +233,10 @@ void Core::Render()
 			glDrawElements(GL_TRIANGLES, m->indices.size(), GL_UNSIGNED_INT, 0);
 		}
 
+
+
 		for (std::shared_ptr<Component> j : (*i)->GetComponents())
 			j->PostRender();
 	}
+
 }

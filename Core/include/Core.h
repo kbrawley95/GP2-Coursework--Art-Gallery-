@@ -22,6 +22,8 @@ public:
 	void Input(SDL_Event* e);
 	void Update();
 	void Render();
+	void RenderSkyBox();
+	void RenderGameObjects();
 
 private:
 	SDL_Window* window;

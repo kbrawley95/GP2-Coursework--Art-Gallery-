@@ -35,9 +35,10 @@ Material::Material(std::string vsPath, std::string fsPath)
 	glDeleteShader(vertexShaderProgram);
 	glDeleteShader(fragmentShaderProgram);
 }
+
 Material::~Material()
 {
-
+	glDeleteTextures(1, &environmentMap);
 }
 
 void Material::LoadTexture(std::string filename)
