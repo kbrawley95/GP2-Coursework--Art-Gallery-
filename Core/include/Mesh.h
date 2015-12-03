@@ -32,6 +32,7 @@ private:
 	void ProcessAttribute(FbxNodeAttribute* attribute);
 	void ProcessMesh(FbxMesh* mesh);
 	void ProcessMeshTextureCoords(FbxMesh* mesh, Vertex* verts, int numVerts);
+	void ProcessMeshNormals(FbxMesh * mesh, Vertex * verts, int numVerts);
 };
 
 #endif

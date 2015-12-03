@@ -155,9 +155,9 @@ void Core::Render()
 	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	glDepthMask(GL_FALSE);
+/*	glDepthMask(GL_FALSE);
 	RenderSkyBox();
-	glDepthMask(GL_TRUE);
+	glDepthMask(GL_TRUE)*/;
 
 	RenderGameObjects();
 }

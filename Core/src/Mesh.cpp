@@ -63,15 +63,19 @@ void Mesh::GenerateBuffers()
 	//Copy Index data to the EBO
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size()*sizeof(int), &indices[0], GL_STATIC_DRAW);
 
+
 	//Tell the shader that 0 is the position element
 	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), NULL);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, position));
 
 	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void**)(sizeof(glm::vec3)));
+	glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, colour));
 
 	glEnableVertexAttribArray(2);
-	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void**)(sizeof(glm::vec3) + sizeof(glm::vec4)));
+	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, texCoords));
+
+	glEnableVertexAttribArray(3);
+	glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, normal));
 }
 
 void Mesh::GenerateSkyBoxBuffers()
@@ -83,13 +87,16 @@ void Mesh::GenerateSkyBoxBuffers()
 
 	//Tell the shader that 0 is the position element
 	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), NULL);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, position));
 
 	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void**)(sizeof(glm::vec3)));
+	glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, colour));
 
 	glEnableVertexAttribArray(2);
-	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void**)(sizeof(glm::vec3) + sizeof(glm::vec4)));
+	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, texCoords));
+
+	glEnableVertexAttribArray(3);
+	glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, normal));
 	
 }
 
@@ -211,10 +218,12 @@ void Mesh::ProcessMesh(FbxMesh* mesh)
 		FbxVector4 currentVert = mesh->GetControlPointAt(i);
 		verts[i].position = glm::vec3(currentVert[0], currentVert[1], currentVert[2]);
 		verts[i].colour = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
+		verts[i].normal = glm::vec3(0.0f, 0.0f, 0.0f);
 		verts[i].texCoords = glm::vec2(0.0f, 0.0f);
 	}
 
 	ProcessMeshTextureCoords(mesh, verts, numVerts);
+	ProcessMeshNormals(mesh, verts, numVerts);
 
 	for (int i = 0; i < numVerts; i++)
 		vertices.push_back(verts[i]);
@@ -262,6 +271,21 @@ void Mesh::ProcessMeshTextureCoords(FbxMesh* mesh, Vertex* verts, int numVerts)
 				verts[fbxCornerIndex].texCoords.y = 1.0f - fbxUV[1]; //y is inverted
 
 			}
+		}
+	}
+}
+
+void Mesh::ProcessMeshNormals(FbxMesh * mesh, Vertex * verts, int numVerts)
+{
+	for (int iPolygon = 0; iPolygon < mesh->GetPolygonCount(); iPolygon++) {
+		for (unsigned iPolygonVertex = 0; iPolygonVertex < 3; iPolygonVertex++) {
+			int fbxCornerIndex = mesh->GetPolygonVertex(iPolygon, iPolygonVertex);
+			FbxVector4 fbxNormal;
+			mesh->GetPolygonVertexNormal(iPolygon, iPolygonVertex, fbxNormal);
+			fbxNormal.Normalize();
+			verts[fbxCornerIndex].normal.x = fbxNormal[0];
+			verts[fbxCornerIndex].normal.y = fbxNormal[1];
+			verts[fbxCornerIndex].normal.z = fbxNormal[2];
 		}
 	}
 }

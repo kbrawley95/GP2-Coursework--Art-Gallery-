@@ -27,30 +27,30 @@ int main(int argc, char *argv[])
 	const std::string skyboxTop = TEXTURE_PATH + "ashcanyon_up.png";
 	const std::string skyboxBottom = TEXTURE_PATH + "ashcanyon_dn.png";
 
-	skyboxMesh->material = std::shared_ptr<Material>(new Material(SHADER_PATH + "skyVS.glsl", SHADER_PATH + "skyFS.glsl"));
-	skyboxMesh->material->SetCubeMapTextures(skyboxFront, skyboxBack, skyboxLeft, skyboxRight, skyboxTop, skyboxBottom);
-	skyboxMesh->GenerateSkyBoxBuffers();
-	GameObjects.push_back(skybox);
+	//skyboxMesh->material = std::shared_ptr<Material>(new Material(SHADER_PATH + "skyVS.glsl", SHADER_PATH + "skyFS.glsl"));
+	//skyboxMesh->material->SetCubeMapTextures(skyboxFront, skyboxBack, skyboxLeft, skyboxRight, skyboxTop, skyboxBottom);
+	//skyboxMesh->GenerateSkyBoxBuffers();
+	//GameObjects.push_back(skybox);
 
 	
 	std::shared_ptr<GameObject> obj = std::shared_ptr<GameObject>(new GameObject());
 	obj->transform.position = Vector3(15, 0, 0);
 	std::shared_ptr<Mesh> m = obj->AddComponent<Mesh>();
-	m->LoadFBX(MODEL_PATH + "utah-teapot.fbx");
+	m->LoadFBX(MODEL_PATH + "Art_Gallery1.fbx");
 	m->material = std::shared_ptr<Material>(new Material(SHADER_PATH + "textureVS.glsl", SHADER_PATH + "textureFS.glsl"));
 	m->material->LoadTexture(TEXTURE_PATH + "texture.png");
 	m->GenerateBuffers();
 	GameObjects.push_back(obj);
 	
 
-	/*std::shared_ptr<GameObject> obj2 = std::shared_ptr<GameObject>(new GameObject());
+	std::shared_ptr<GameObject> obj2 = std::shared_ptr<GameObject>(new GameObject());
 	obj2->transform.position = Vector3(0, 0, -40);
 	std::shared_ptr<Mesh> m2 = obj2->AddComponent<Mesh>();
 	m2->LoadFBX(MODEL_PATH + "armoredrecon.fbx");
 	m2->material = std::shared_ptr<Material>(new Material(SHADER_PATH + "textureVS.glsl", SHADER_PATH + "textureFS.glsl"));
 	m2->material->LoadTexture(TEXTURE_PATH + "armoredrecon_diff.png");
 	m2->GenerateBuffers();
-	GameObjects.push_back(obj2);*/
+	GameObjects.push_back(obj2);
 
 	engine->Start();
 }
