@@ -148,6 +148,8 @@ void Core::Update()
 			j->Update();
 
 	MainCamera->Update();
+
+	SkyBox->transform.position = MainCamera->transform.position;
 }
 
 void Core::Render()
@@ -155,35 +157,24 @@ void Core::Render()
 	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	//glDepthMask(GL_FALSE);
-	//RenderSkyBox();
-	//glDepthMask(GL_TRUE);
+	glDepthMask(GL_FALSE);
+	RenderGameObjects(SkyBox);
+	glDepthMask(GL_TRUE);
 
 	for (auto i = GameObjects.begin(); i != GameObjects.end(); ++i)
 	{
-		for (std::shared_ptr<Component> j : (*i)->GetComponents())
-			j->PreRender();
-
 		RenderGameObjects((*i));
 		for (std::shared_ptr<GameObject> j : (*i)->GetChildren())
 		{
 			RenderGameObjects(j);
+
+			for (std::shared_ptr<Component> K : (*i)->GetComponents())
+				K->PostRender();
 		}
 
-		for (std::shared_ptr<Component> j : (*i)->GetComponents())
-			j->PostRender();
+		for (std::shared_ptr<Component> K : (*i)->GetComponents())
+			K->PostRender();
 	}
-}
-
-void Core::RenderSkyBox()
-{
-	std::shared_ptr<Mesh> m = std::shared_ptr<Mesh>(new Mesh());
-
-	
-	glGenVertexArrays(1, &m->skyboxVAO);
-	glBindTexture(GL_TEXTURE_CUBE_MAP, std::shared_ptr<Material>(new Material(SHADER_PATH + "skyVS.glsl", SHADER_PATH + "skyFS.glsl"))->GetCubeMap());
-	glDrawArrays(GL_TRIANGLES, 0, 36);
-	glBindVertexArray(0);
 }
 
 void Core::RenderGameObjects(std::shared_ptr<GameObject> g)
@@ -195,18 +186,17 @@ void Core::RenderGameObjects(std::shared_ptr<GameObject> g)
 
 		GLint MVPLocation = glGetUniformLocation(m->GetMaterial()->GetShader(), "MVP");
 		GLint texture0Location = glGetUniformLocation(m->GetMaterial()->GetShader(), "texture0");
-
-		GLint cubeTextureLocal = glGetUniformLocation(m->GetMaterial()->GetShader(), "cubeTexture");
-
-		glUniform1i(cubeTextureLocal, 1);
-
+		GLint cubeTexture = glGetUniformLocation(m->GetMaterial()->GetShader(), "cubeTexture");
 
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, m->GetMaterial()->GetTexture());
 
+		glActiveTexture(GL_TEXTURE1);
+		glBindTexture(GL_TEXTURE_2D, m->GetMaterial()->GetCubeMap());
+
 		glUniformMatrix4fv(MVPLocation, 1, GL_FALSE, glm::value_ptr(g->GetMVPMatrix()));
 		glUniform1i(texture0Location, 0);
-
+		glUniform1i(cubeTexture, 1);
 
 
 		if (lighting)
@@ -240,6 +230,5 @@ void Core::RenderGameObjects(std::shared_ptr<GameObject> g)
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m->EBO);
 
 		glDrawElements(GL_TRIANGLES, m->indices.size(), GL_UNSIGNED_INT, 0);
-
 	}
 }

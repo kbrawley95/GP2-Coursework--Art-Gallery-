@@ -22,7 +22,6 @@ public:
 	void Input(SDL_Event* e);
 	void Update();
 	void Render();
-	void RenderSkyBox();
 
 private:
 	SDL_Window* window;

@@ -16,11 +16,9 @@ public:
 	GLuint VBO;
 	GLuint EBO;
 	GLuint VAO;
-	GLuint skyboxVAO;
 
 	bool LoadFBX(std::string filename);
 	void GenerateBuffers();
-	void GenerateSkyBoxBuffers();
 
 	Mesh();
 	~Mesh();

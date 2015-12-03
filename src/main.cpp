@@ -1,9 +1,11 @@
 #include "Core.h"
+#include "Cube.h"
 
 //I know its shit brian. Just trust!
 #define SDL_main main
 std::shared_ptr<Camera> MainCamera;
 std::shared_ptr<DirectionalLight> MainLight;
+std::shared_ptr<GameObject> SkyBox;
 std::vector<std::shared_ptr<GameObject>> GameObjects;
 float deltaTime;
 
@@ -16,9 +18,15 @@ int main(int argc, char *argv[])
 	MainCamera = std::shared_ptr<Camera>(new Camera());
 	MainCamera->transform.position = Vector3(0, 10, -50);
 
-	std::shared_ptr<GameObject> skybox = std::shared_ptr<GameObject>(new GameObject);
-	skybox->transform.position = Vector3(0, 0, -40);
-	std::shared_ptr<Mesh> skyboxMesh = skybox->AddComponent<Mesh>();
+	SkyBox = std::shared_ptr<GameObject>(new GameObject());
+	SkyBox->transform.position = Vector3(0, 0, -40);
+	std::shared_ptr<Mesh> skyboxMesh = SkyBox->AddComponent<Mesh>();
+	skyboxMesh->vertices.clear();
+	skyboxMesh->indices.clear();
+	for (int i = 0; i < numberOfCubeVerts; i++)
+		skyboxMesh->vertices.push_back(cubeVerts[i]);
+	for (int i = 0; i < numberOfCubeIndices; i++)
+		skyboxMesh->indices.push_back(cubeIndices[i]);
 
 	const std::string skyboxFront = TEXTURE_PATH + "ashcanyon_ft.png";
 	const std::string skyboxBack = TEXTURE_PATH + "ashcanyon_bk.png";
@@ -27,10 +35,9 @@ int main(int argc, char *argv[])
 	const std::string skyboxTop = TEXTURE_PATH + "ashcanyon_up.png";
 	const std::string skyboxBottom = TEXTURE_PATH + "ashcanyon_dn.png";
 
-	//skyboxMesh->material = std::shared_ptr<Material>(new Material(SHADER_PATH + "skyVS.glsl", SHADER_PATH + "skyFS.glsl"));
-	//skyboxMesh->material->SetCubeMapTextures(skyboxFront, skyboxBack, skyboxLeft, skyboxRight, skyboxTop, skyboxBottom);
-	//skyboxMesh->GenerateBuffers();
-	//GameObjects.push_back(skybox);
+	skyboxMesh->SetMaterial(std::shared_ptr<Material>(new Material(SHADER_PATH + "skyVS.glsl", SHADER_PATH + "skyFS.glsl")));
+	skyboxMesh->GetMaterial()->SetCubeMapTextures(skyboxFront, skyboxBack, skyboxLeft, skyboxRight, skyboxTop, skyboxBottom);
+	skyboxMesh->GenerateBuffers();
 	//
 	//std::shared_ptr<GameObject> obj = std::shared_ptr<GameObject>(new GameObject());
 	//obj->transform.position = Vector3(0, 0, -30);
