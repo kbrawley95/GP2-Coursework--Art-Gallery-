@@ -155,88 +155,91 @@ void Core::Render()
 	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	glDepthMask(GL_FALSE);
-	RenderSkyBox();
-	glDepthMask(GL_TRUE);
+	//glDepthMask(GL_FALSE);
+	//RenderSkyBox();
+	//glDepthMask(GL_TRUE);
 
-	RenderGameObjects();
+	for (auto i = GameObjects.begin(); i != GameObjects.end(); ++i)
+	{
+		for (std::shared_ptr<Component> j : (*i)->GetComponents())
+			j->PreRender();
+
+		RenderGameObjects((*i));
+		for (std::shared_ptr<GameObject> j : (*i)->GetChildren())
+		{
+			RenderGameObjects(j);
+		}
+
+		for (std::shared_ptr<Component> j : (*i)->GetComponents())
+			j->PostRender();
+	}
 }
 
 void Core::RenderSkyBox()
 {
 	std::shared_ptr<Mesh> m = std::shared_ptr<Mesh>(new Mesh());
 
-	GLint cubeTextureLocal = glGetUniformLocation(m->material->GetShader(), "cubeTexture");
-
-	glUniform1i(cubeTextureLocal, 1);
+	
 	glGenVertexArrays(1, &m->skyboxVAO);
 	glBindTexture(GL_TEXTURE_CUBE_MAP, std::shared_ptr<Material>(new Material(SHADER_PATH + "skyVS.glsl", SHADER_PATH + "skyFS.glsl"))->GetCubeMap());
 	glDrawArrays(GL_TRIANGLES, 0, 36);
 	glBindVertexArray(0);
 }
 
-void Core::RenderGameObjects()
+void Core::RenderGameObjects(std::shared_ptr<GameObject> g)
 {
-	
-	for (auto i = GameObjects.begin(); i != GameObjects.end(); ++i)
+	std::shared_ptr<Mesh>m = g->GetComponent<Mesh>();
+	if (m != nullptr)
 	{
-		for (std::shared_ptr<Component> j : (*i)->GetComponents())
-			j->PostRender();
+		glUseProgram(m->GetMaterial()->GetShader());
 
-		std::shared_ptr<Mesh> m = (*i)->GetComponent<Mesh>();
-		if (m != nullptr)
+		GLint MVPLocation = glGetUniformLocation(m->GetMaterial()->GetShader(), "MVP");
+		GLint texture0Location = glGetUniformLocation(m->GetMaterial()->GetShader(), "texture0");
+
+		GLint cubeTextureLocal = glGetUniformLocation(m->GetMaterial()->GetShader(), "cubeTexture");
+
+		glUniform1i(cubeTextureLocal, 1);
+
+
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, m->GetMaterial()->GetTexture());
+
+		glUniformMatrix4fv(MVPLocation, 1, GL_FALSE, glm::value_ptr(g->GetMVPMatrix()));
+		glUniform1i(texture0Location, 0);
+
+
+
+		if (lighting)
 		{
-			glUseProgram(m->material->GetShader());
+			GLint ambientLightColourLocation = glGetUniformLocation(m->GetMaterial()->GetShader(), "ambientLightColour");
+			GLint ambientMaterialColourLocation = glGetUniformLocation(m->GetMaterial()->GetShader(), "ambientMaterialColour");
 
-			GLint MVPLocation = glGetUniformLocation(m->material->GetShader(), "MVP");
-			GLint texture0Location = glGetUniformLocation(m->material->GetShader(), "texture0");
+			GLint diffuseLightColourLocation = glGetUniformLocation(m->GetMaterial()->GetShader(), "diffuseLightColour");
+			GLint diffuseLightMaterialLocation = glGetUniformLocation(m->GetMaterial()->GetShader(), "diffuseMaterialColour");
+			GLint lightDirectionLocation = glGetUniformLocation(m->GetMaterial()->GetShader(), "lightDirection");
 
-
-			glActiveTexture(GL_TEXTURE0);
-			glBindTexture(GL_TEXTURE_2D, m->material->GetTexture());
-
-			glUniformMatrix4fv(MVPLocation, 1, GL_FALSE, glm::value_ptr((*i)->GetMVPMatrix()));
-			glUniform1i(texture0Location, 0);
-
+			GLint specularLightColourLocation = glGetUniformLocation(m->GetMaterial()->GetShader(), "specularLightColour");
+			GLint specularLightMaterialLocation = glGetUniformLocation(m->GetMaterial()->GetShader(), "specularMaterialColour");
+			GLint specularPowerLocation = glGetUniformLocation(m->GetMaterial()->GetShader(), "specularPower");
 
 
-			if (lighting)
-			{
-				GLint ambientLightColourLocation = glGetUniformLocation(m->material->GetShader(), "ambientLightColour");
-				GLint ambientMaterialColourLocation = glGetUniformLocation(m->material->GetShader(), "ambientMaterialColour");
+			glUniform4fv(ambientLightColourLocation, 1, value_ptr(MainLight->ambientLightColor.ConvertToVec4()));
+			glUniform4fv(ambientMaterialColourLocation, 1, value_ptr(m->GetMaterial()->ambientMaterial.ConvertToVec4()));
 
-				GLint diffuseLightColourLocation = glGetUniformLocation(m->material->GetShader(), "diffuseLightColour");
-				GLint diffuseLightMaterialLocation = glGetUniformLocation(m->material->GetShader(), "diffuseMaterialColour");
-				GLint lightDirectionLocation = glGetUniformLocation(m->material->GetShader(), "lightDirection");
+			glUniform4fv(diffuseLightColourLocation, 1, value_ptr(MainLight->diffuseLightColor.ConvertToVec4()));
+			glUniform4fv(diffuseLightMaterialLocation, 1, value_ptr(m->GetMaterial()->diffuseMaterial.ConvertToVec4()));
+			glUniform3fv(lightDirectionLocation, 1, value_ptr(MainLight->direction.ConvertToVec3()));
 
-				GLint specularLightColourLocation = glGetUniformLocation(m->material->GetShader(), "specularLightColour");
-				GLint specularLightMaterialLocation = glGetUniformLocation(m->material->GetShader(), "specularMaterialColour");
-				GLint specularPowerLocation = glGetUniformLocation(m->material->GetShader(), "specularPower");
-
-
-				glUniform4fv(ambientLightColourLocation, 1, value_ptr(MainLight->ambientLightColor.ConvertToVec4()));
-				glUniform4fv(ambientMaterialColourLocation, 1, value_ptr(m->material->ambientMaterial.ConvertToVec4()));
-
-				glUniform4fv(diffuseLightColourLocation, 1, value_ptr(MainLight->diffuseLightColor.ConvertToVec4()));
-				glUniform4fv(diffuseLightMaterialLocation, 1, value_ptr(m->material->diffuseMaterial.ConvertToVec4()));
-				glUniform3fv(lightDirectionLocation, 1, value_ptr(MainLight->direction.ConvertToVec3()));
-
-				glUniform4fv(specularLightColourLocation, 1, value_ptr(MainLight->specularLightColor.ConvertToVec4()));
-				glUniform4fv(specularLightMaterialLocation, 1, value_ptr(m->material->specularMaterial.ConvertToVec4()));
-				glUniform1f(specularPowerLocation, m->material->specularPower);
-			}
-
-			glBindVertexArray(m->VAO);
-			glBindBuffer(GL_ARRAY_BUFFER, m->VBO);
-			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m->EBO);
-
-			glDrawElements(GL_TRIANGLES, m->indices.size(), GL_UNSIGNED_INT, 0);
+			glUniform4fv(specularLightColourLocation, 1, value_ptr(MainLight->specularLightColor.ConvertToVec4()));
+			glUniform4fv(specularLightMaterialLocation, 1, value_ptr(m->GetMaterial()->specularMaterial.ConvertToVec4()));
+			glUniform1f(specularPowerLocation, m->GetMaterial()->specularPower);
 		}
 
+		glBindVertexArray(m->VAO);
+		glBindBuffer(GL_ARRAY_BUFFER, m->VBO);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m->EBO);
 
+		glDrawElements(GL_TRIANGLES, m->indices.size(), GL_UNSIGNED_INT, 0);
 
-		for (std::shared_ptr<Component> j : (*i)->GetComponents())
-			j->PostRender();
 	}
-
 }

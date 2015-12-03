@@ -32,7 +32,7 @@ bool Mesh::LoadFBX(std::string filename)
 	if (rootNode)
 	{
 		for (int i = 0; i < rootNode->GetChildCount(); i++)
-			ProcessNode(rootNode->GetChild(i));
+			ProcessNode(rootNode->GetChild(i), gameObject);
 	}
 
 	importer->Destroy();
@@ -42,6 +42,15 @@ bool Mesh::LoadFBX(std::string filename)
 
 void Mesh::GenerateBuffers()
 {
+	for (std::shared_ptr<GameObject> i : (*gameObject).GetChildren())
+	{
+		std::shared_ptr<Mesh> m = i->GetComponent<Mesh>();
+		if (m != nullptr)
+			m->GenerateBuffers();
+	}
+	
+	if (vertices.size() == 0)
+		return;
 	if (material == nullptr)
 	{
 		std::cout << "No Material found. Using default material & texture" << std::endl;
@@ -63,15 +72,19 @@ void Mesh::GenerateBuffers()
 	//Copy Index data to the EBO
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size()*sizeof(int), &indices[0], GL_STATIC_DRAW);
 
+	
 	//Tell the shader that 0 is the position element
 	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), NULL);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, position));
 
 	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void**)(sizeof(glm::vec3)));
+	glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, colour));
 
 	glEnableVertexAttribArray(2);
-	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void**)(sizeof(glm::vec3) + sizeof(glm::vec4)));
+	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, texCoords));
+
+	glEnableVertexAttribArray(3);
+	glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, normal));
 }
 
 void Mesh::GenerateSkyBoxBuffers()
@@ -104,6 +117,11 @@ Mesh::~Mesh()
 	glDeleteVertexArrays(1, &VAO);
 	vertices.clear();
 	indices.clear();
+}
+
+void Mesh::SetMaterial(std::shared_ptr<Material> mat)
+{
+	material = mat;
 }
 
 
@@ -154,32 +172,35 @@ FbxString Mesh::GetAttributeTypeName(FbxNodeAttribute::EType type)
 		return "LOD Group";
 	case fbxsdk::FbxNodeAttribute::eSubDiv:
 		return "subdivision";
-	case fbxsdk::FbxNodeAttribute::eCachedEffect:
-		return "cached effect";
-	case fbxsdk::FbxNodeAttribute::eLine:
-		return "line";
 	default:
 		return "unknown";
 	}
 }
 
-void Mesh::ProcessNode(FbxNode* node)
+void Mesh::ProcessNode(FbxNode* node, std::shared_ptr<GameObject> parent)
 {
+	std::shared_ptr<GameObject> child = std::shared_ptr<GameObject>(new GameObject());
+	child->AddComponent<Mesh>();
+	parent->AddChild(child);
 	const char* nodeName = node->GetName();
 	FbxDouble3 translation = node->LclTranslation.Get();
 	FbxDouble3 rotation = node->LclRotation.Get();
 	FbxDouble3 scaling = node->LclScaling.Get();
 
+	child->transform.position = Vector3(translation[0], translation[1], translation[2]);
+	child->transform.position = Vector3(rotation[0], rotation[1], rotation[2]);
+	child->transform.position = Vector3(scaling[0], scaling[1], scaling[2]);
+
 	//Print the node's attributes
 	for (int i = 0; i < node->GetNodeAttributeCount(); i++)
-		ProcessAttribute(node->GetNodeAttributeByIndex(i));
+		ProcessAttribute(node->GetNodeAttributeByIndex(i), child);
 
 	//Recursively print the children
 	for (int j = 0; j < node->GetChildCount(); j++)
-		ProcessNode(node->GetChild(j));
+		ProcessNode(node->GetChild(j), child);
 }
 
-void Mesh::ProcessAttribute(FbxNodeAttribute* attribute)
+void Mesh::ProcessAttribute(FbxNodeAttribute* attribute, std::shared_ptr<GameObject> child)
 {
 	if (!attribute)
 		return;
@@ -189,7 +210,7 @@ void Mesh::ProcessAttribute(FbxNodeAttribute* attribute)
 	switch (attribute->GetAttributeType())
 	{
 	case FbxNodeAttribute::eMesh:
-		ProcessMesh(attribute->GetNode()->GetMesh());
+		ProcessMesh(attribute->GetNode()->GetMesh(), child);
 		break;
 	case FbxNodeAttribute::eCamera:
 	case FbxNodeAttribute::eLight:
@@ -198,7 +219,7 @@ void Mesh::ProcessAttribute(FbxNodeAttribute* attribute)
 	}
 }
 
-void Mesh::ProcessMesh(FbxMesh* mesh)
+void Mesh::ProcessMesh(FbxMesh* mesh, std::shared_ptr<GameObject> child)
 {
 	int numVerts = mesh->GetControlPointsCount();
 	int numIndices = mesh->GetPolygonVertexCount();
@@ -211,16 +232,18 @@ void Mesh::ProcessMesh(FbxMesh* mesh)
 		FbxVector4 currentVert = mesh->GetControlPointAt(i);
 		verts[i].position = glm::vec3(currentVert[0], currentVert[1], currentVert[2]);
 		verts[i].colour = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
+		verts[i].normal = glm::vec3(0.0f, 0.0f, 0.0f);
 		verts[i].texCoords = glm::vec2(0.0f, 0.0f);
 	}
 
 	ProcessMeshTextureCoords(mesh, verts, numVerts);
+	ProcessMeshNormals(mesh, verts, numVerts);
 
 	for (int i = 0; i < numVerts; i++)
-		vertices.push_back(verts[i]);
+		child->GetComponent<Mesh>()->vertices.push_back(verts[i]);
 
 	for (int i = 0; i < numIndices; i++)
-		indices.push_back(inds[i]);
+		child->GetComponent<Mesh>()->indices.push_back(inds[i]);
 
 	if (verts)
 	{
@@ -262,6 +285,21 @@ void Mesh::ProcessMeshTextureCoords(FbxMesh* mesh, Vertex* verts, int numVerts)
 				verts[fbxCornerIndex].texCoords.y = 1.0f - fbxUV[1]; //y is inverted
 
 			}
+		}
+	}
+}
+
+void Mesh::ProcessMeshNormals(FbxMesh * mesh, Vertex * verts, int numVerts)
+{
+	for (int iPolygon = 0; iPolygon < mesh->GetPolygonCount(); iPolygon++) {
+		for (unsigned iPolygonVertex = 0; iPolygonVertex < 3; iPolygonVertex++) {
+			int fbxCornerIndex = mesh->GetPolygonVertex(iPolygon, iPolygonVertex);
+			FbxVector4 fbxNormal;
+			mesh->GetPolygonVertexNormal(iPolygon, iPolygonVertex, fbxNormal);
+			fbxNormal.Normalize();
+			verts[fbxCornerIndex].normal.x = fbxNormal[0];
+			verts[fbxCornerIndex].normal.y = fbxNormal[1];
+			verts[fbxCornerIndex].normal.z = fbxNormal[2];
 		}
 	}
 }

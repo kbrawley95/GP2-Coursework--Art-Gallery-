@@ -23,11 +23,12 @@ public:
 	void Update();
 	void Render();
 	void RenderSkyBox();
-	void RenderGameObjects();
 
 private:
 	SDL_Window* window;
 	SDL_GLContext context;
+
+	void RenderGameObjects(std::shared_ptr<GameObject> g);
 };
 
 #endif

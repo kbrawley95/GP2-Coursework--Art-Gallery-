@@ -8,7 +8,7 @@
 #include "Scene.h"
 #include "Component.h"
 
-class GameObject
+class GameObject : public std::enable_shared_from_this<GameObject>
 {
 public:
 	std::string name;
@@ -33,6 +33,19 @@ public:
 
 	}
 
+	std::vector<std::shared_ptr<GameObject>> GetChildren()
+	{
+		return children;
+	}
+	std::shared_ptr<GameObject> GetChild(int x)
+	{
+		return children[x];
+	}
+	void AddChild(std::shared_ptr<GameObject> child)
+	{
+		children.push_back(child);
+	}
+
 	std::vector<std::shared_ptr<Component>> GetComponents()
 	{
 		return components;
@@ -40,9 +53,10 @@ public:
 	template <typename T>
 	std::shared_ptr<T> AddComponent()
 	{
-		std::shared_ptr<T> component = std::shared_ptr<T>(new T());
+		std::shared_ptr<Component> component = std::shared_ptr<T>(new T());
+		component->gameObject = shared_from_this();
 		components.push_back(component);
-		return component;
+		return std::dynamic_pointer_cast<T>(component);
 	}
 	template <typename T>
 	std::shared_ptr<T> GetComponent()
@@ -59,6 +73,7 @@ public:
 
 private:
 	std::vector<std::shared_ptr<Component>> components;
+	std::vector<std::shared_ptr<GameObject>> children;
 };
 
 #endif

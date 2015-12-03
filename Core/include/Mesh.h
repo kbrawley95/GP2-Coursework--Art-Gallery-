@@ -5,13 +5,13 @@
 #include "Material.h"
 #include "Vertex.h"
 #include "Component.h"
+#include "GameObject.h"
 
 class Mesh : public Component
 {
 public:
 	std::vector<Vertex> vertices;
 	std::vector<int> indices;
-	std::shared_ptr<Material> material = nullptr;
 
 	GLuint VBO;
 	GLuint EBO;
@@ -24,14 +24,22 @@ public:
 
 	Mesh();
 	~Mesh();
+
+	void SetMaterial(std::shared_ptr<Material> mat);
+	std::shared_ptr<Material> GetMaterial()
+	{
+		return material;
+	}
 	
 private:
+	std::shared_ptr<Material> material = nullptr;
 
 	FbxString GetAttributeTypeName(FbxNodeAttribute::EType type);
-	void ProcessNode(FbxNode* node);
-	void ProcessAttribute(FbxNodeAttribute* attribute);
-	void ProcessMesh(FbxMesh* mesh);
+	void ProcessNode(FbxNode* node, std::shared_ptr<GameObject> child);
+	void ProcessAttribute(FbxNodeAttribute* attribute, std::shared_ptr<GameObject> child);
+	void ProcessMesh(FbxMesh* mesh, std::shared_ptr<GameObject> child);
 	void ProcessMeshTextureCoords(FbxMesh* mesh, Vertex* verts, int numVerts);
+	void ProcessMeshNormals(FbxMesh * mesh, Vertex * verts, int numVerts);
 };
 
 #endif

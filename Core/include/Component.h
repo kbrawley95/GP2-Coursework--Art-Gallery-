@@ -3,9 +3,12 @@
 
 #include "Common.h"
 
+class GameObject;
 class Component
 {
 public:
+	std::shared_ptr<GameObject> gameObject;
+
 	Component()
 	{
 
