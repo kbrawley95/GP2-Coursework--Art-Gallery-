@@ -52,18 +52,9 @@ int main(int argc, char *argv[])
 	std::shared_ptr<GameObject> obj2 = std::shared_ptr<GameObject>(new GameObject());
 	obj2->transform.position = Vector3(0, 0, -40);
 	std::shared_ptr<Mesh> m2 = obj2->AddComponent<Mesh>();
-	m2->LoadFBX(MODEL_PATH + "Tank1.fbx");	
-	m2->SetMaterial(std::shared_ptr<Material>(new Material(SHADER_PATH + "textureVS.glsl", SHADER_PATH + "textureFS.glsl")));
-	m2->GetMaterial()->LoadTexture(TEXTURE_PATH + "Tank1DF.png");
-	for (std::shared_ptr<GameObject> i : obj2->GetChildren())
-	{
-		std::shared_ptr<Mesh> m = i->GetComponent<Mesh>();
-		if (m != nullptr)
-		{
-			m->SetMaterial(std::shared_ptr<Material>(new Material(SHADER_PATH + "textureVS.glsl", SHADER_PATH + "textureFS.glsl")));
-			m->GetMaterial()->LoadTexture(TEXTURE_PATH + "Tank1DF.png");
-		}
-	}
+	std::shared_ptr<Material> mat = std::shared_ptr<Material>(new Material(SHADER_PATH + "textureVS.glsl", SHADER_PATH + "textureFS.glsl"));
+	mat->LoadTexture(TEXTURE_PATH + "Tank1DF.png");
+	m2->LoadFBX(MODEL_PATH + "Art_Gallery1.fbx", mat);
 	m2->GenerateBuffers();
 	GameObjects.push_back(obj2);
 

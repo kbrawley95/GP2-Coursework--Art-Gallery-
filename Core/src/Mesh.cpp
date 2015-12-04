@@ -1,7 +1,8 @@
 #include "Mesh.h"
 
-bool Mesh::LoadFBX(std::string filename)
+bool Mesh::LoadFBX(std::string filename, std::shared_ptr<Material> mat)
 {
+	material = mat;
 	std::cout << "Loading " << filename << std::endl;
 	//Initialize the SDK manager. This object handles memory management
 	FbxManager* sdkManager = FbxManager::Create();
@@ -161,7 +162,7 @@ FbxString Mesh::GetAttributeTypeName(FbxNodeAttribute::EType type)
 void Mesh::ProcessNode(FbxNode* node, std::shared_ptr<GameObject> parent)
 {
 	std::shared_ptr<GameObject> child = std::shared_ptr<GameObject>(new GameObject());
-	child->AddComponent<Mesh>();
+	child->AddComponent<Mesh>()->material = material;
 	parent->AddChild(child);
 	const char* nodeName = node->GetName();
 	FbxDouble3 translation = node->LclTranslation.Get();

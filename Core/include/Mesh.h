@@ -17,7 +17,7 @@ public:
 	GLuint EBO;
 	GLuint VAO;
 
-	bool LoadFBX(std::string filename);
+	bool LoadFBX(std::string filename, std::shared_ptr<Material> mat);
 	void GenerateBuffers();
 
 	Mesh();
