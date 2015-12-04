@@ -3,6 +3,7 @@
 
 #include "Common.h"
 #include "Transform.h"
+#include "Input.h"
 
 class Camera
 {
@@ -14,7 +15,6 @@ public:
 	float zFar;
 
 	//Keyboard State
-	const Uint8 *keyboardState;
 	int currentTime, prevTime;
 	float deltaTime;
 
@@ -28,55 +28,44 @@ public:
 
 	void KeyboardState()
 	{
-		keyboardState = SDL_GetKeyboardState(NULL);
-
-		if (keyboardState[SDL_SCANCODE_A])
+		if (keysPressed[SDLK_a])
 		{
 			transform.position.x += 10.0f*deltaTime;
 		}
-		else if (keyboardState[SDL_SCANCODE_D])
+		else if (keysPressed[SDLK_d])
 		{
 			transform.position.x -= 10.0f*deltaTime;
 		}
-		else if (keyboardState[SDL_SCANCODE_W])
+		else if (keysPressed[SDLK_w])
 		{
 			transform.position.z += 10.0f*deltaTime;
 		}
-		else if (keyboardState[SDL_SCANCODE_S])
+		else if (keysPressed[SDLK_s])
 		{
 			transform.position.z -= 10.0f*deltaTime;
 		}
 
-		if (keyboardState[SDL_SCANCODE_LEFT])
+		if (keysPressed[SDLK_LEFT])
 		{
 			transform.rotation.x += 10.0f*deltaTime;
 		}
-		else if (keyboardState[SDL_SCANCODE_RIGHT])
+		else if (keysPressed[SDLK_RIGHT])
 		{
 			transform.rotation.x -= 10.0f*deltaTime;
 		}
-		else if (keyboardState[SDL_SCANCODE_UP])
+		else if (keysPressed[SDLK_UP])
 		{
 			transform.rotation.z += 10.0f*deltaTime;
 		}
-		else if (keyboardState[SDL_SCANCODE_DOWN])
+		else if (keysPressed[SDLK_DOWN])
 		{
 			transform.rotation.z -= 10.0f*deltaTime;
 		}
 
+		transform.rotation.y += mouseDelta.x * 10.0f * deltaTime;
+		transform.rotation.x += mouseDelta.y * 10.0f * deltaTime;
 	}
-	/*
-	void Input(SDL_Event *e)
-	{
-		int x, y;
-		SDL_GetMouseState(&x, &y);
 
-		if (e->type == SDL_MOUSEMOTION)
-		{
-			SDL_WarpMouseInWindow();
-		}
-	}
-	*/
 	Camera()
 	{
 		fov = 45.0f;

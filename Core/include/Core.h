@@ -8,6 +8,7 @@
 #include "Material.h"
 #include "Mesh.h"
 #include "DirectionalLight.h"
+#include "Input.h"
 
 class Core
 {

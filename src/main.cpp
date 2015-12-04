@@ -8,6 +8,9 @@ std::shared_ptr<DirectionalLight> MainLight;
 std::shared_ptr<GameObject> SkyBox;
 std::vector<std::shared_ptr<GameObject>> GameObjects;
 float deltaTime;
+Vector2 mousePosition;
+std::map<int, bool> keysPressed;
+Vector2 mouseDelta;
 
 int main(int argc, char *argv[])
 {

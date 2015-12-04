@@ -146,6 +146,15 @@ void Core::Input(SDL_Event* e)
 		for (std::shared_ptr<Component> j : (*i)->GetComponents())
 			j->Input(e);
 
+	if (e->type == SDL_KEYDOWN)
+		keysPressed[e->key.keysym.sym] = true;
+	if (e->type == SDL_KEYUP)
+		keysPressed[e->key.keysym.sym] = false;
+
+	int x, y;
+	SDL_GetMouseState(&x, &y);
+	mouseDelta = Vector2(x - mousePosition.x, y - mousePosition.y);
+	mousePosition = Vector2(static_cast<float>(x), static_cast<float>(y));
 }
 
 void Core::Update()
