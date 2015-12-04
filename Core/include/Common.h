@@ -23,6 +23,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtx/string_cast.hpp>
+#include <glm/gtc/constants.hpp>
 
 const std::string ASSET_PATH = "assets/";
 const std::string SHADER_PATH = ASSET_PATH + "shaders/";

@@ -13,20 +13,26 @@ class GameObject : public std::enable_shared_from_this<GameObject>
 public:
 	std::string name;
 	Transform transform;
+	std::shared_ptr<GameObject> parent;
 
 	glm::mat4 GetMVPMatrix()
 	{
-		return MainCamera->GetProjectionMatrix() * MainCamera->GetViewMatrix() * transform.GetWorldMatrix();
+		if (parent != nullptr)
+			return MainCamera->GetProjectionMatrix() * MainCamera->GetViewMatrix() * (parent->transform.GetWorldMatrix() * transform.GetWorldMatrix());
+		else
+			return MainCamera->GetProjectionMatrix() * MainCamera->GetViewMatrix() * transform.GetWorldMatrix();
 	}
 
 	GameObject()
 	{
 		transform = Transform();
+		parent = nullptr;
 	}
 	GameObject(std::string n)
 	{
 		transform = Transform();
 		name = n;
+		parent = nullptr;
 	}
 	~GameObject()
 	{
@@ -43,6 +49,7 @@ public:
 	}
 	void AddChild(std::shared_ptr<GameObject> child)
 	{
+		child->parent = shared_from_this();
 		children.push_back(child);
 	}
 

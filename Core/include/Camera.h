@@ -65,7 +65,18 @@ public:
 		}
 
 	}
+	/*
+	void Input(SDL_Event *e)
+	{
+		int x, y;
+		SDL_GetMouseState(&x, &y);
 
+		if (e->type == SDL_MOUSEMOTION)
+		{
+			SDL_WarpMouseInWindow();
+		}
+	}
+	*/
 	Camera()
 	{
 		fov = 45.0f;

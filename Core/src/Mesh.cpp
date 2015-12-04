@@ -170,8 +170,8 @@ void Mesh::ProcessNode(FbxNode* node, std::shared_ptr<GameObject> parent)
 	FbxDouble3 scaling = node->LclScaling.Get();
 
 	child->transform.position = Vector3(translation[0], translation[1], translation[2]);
-	child->transform.position = Vector3(rotation[0], rotation[1], rotation[2]);
-	child->transform.position = Vector3(scaling[0], scaling[1], scaling[2]);
+	child->transform.rotation = Vector3(rotation[0], rotation[1], rotation[2]);
+	child->transform.scale = Vector3(scaling[0], scaling[1], scaling[2]);
 
 	//Print the node's attributes
 	for (int i = 0; i < node->GetNodeAttributeCount(); i++)
