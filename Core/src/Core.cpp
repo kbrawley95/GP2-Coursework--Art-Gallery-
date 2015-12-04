@@ -101,9 +101,16 @@ void Core::Start()
 	std::cout << std::endl << "[Main Loop Started]" << std::endl;
 
 	for (auto i = GameObjects.begin(); i != GameObjects.end(); ++i)
+	{
 		for (std::shared_ptr<Component> j : (*i)->GetComponents())
 			j->Start();
-
+	
+		for (std::shared_ptr<GameObject> j : (*i)->GetChildren())
+		{
+			for (std::shared_ptr<Component> k : j->GetComponents())
+				k->Start();
+		}
+	}
 	SDL_Event events;
 	bool run = true;
 	while (run)
@@ -144,11 +151,18 @@ void Core::Input(SDL_Event* e)
 void Core::Update()
 {
 	for (auto i = GameObjects.begin(); i != GameObjects.end(); ++i)
+	{
 		for (std::shared_ptr<Component> j : (*i)->GetComponents())
 			j->Update();
 
-	MainCamera->Update();
+		for (std::shared_ptr<GameObject> j : (*i)->GetChildren())
+		{
+			for (std::shared_ptr<Component> k : j->GetComponents())
+				k->Start();
+		}
+	}
 
+	MainCamera->Update();
 	SkyBox->transform.position = MainCamera->transform.position;
 }
 
