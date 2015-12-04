@@ -47,11 +47,11 @@ public:
 
 		if (keysPressed[SDLK_LEFT])
 		{
-			transform.rotation.x += 10.0f*deltaTime;
+			transform.rotation.y += 10.0f*deltaTime;
 		}
 		else if (keysPressed[SDLK_RIGHT])
 		{
-			transform.rotation.x -= 10.0f*deltaTime;
+			transform.rotation.y -= 10.0f*deltaTime;
 		}
 		else if (keysPressed[SDLK_UP])
 		{
@@ -62,8 +62,16 @@ public:
 			transform.rotation.z -= 10.0f*deltaTime;
 		}
 
-		transform.rotation.y += mouseDelta.x * 10.0f * deltaTime;
-		transform.rotation.x += mouseDelta.y * 10.0f * deltaTime;
+		transform.rotation.y -= mouseDelta.x;
+		transform.rotation.x += mouseDelta.y;
+
+		if (transform.rotation.x < -30)
+			transform.rotation.x = -30;
+		else if (transform.rotation.x > 30)
+			transform.rotation.x = 30;
+
+		forward = glm::vec3(transform.GetWorldMatrix()[2]);
+		
 	}
 
 	Camera()

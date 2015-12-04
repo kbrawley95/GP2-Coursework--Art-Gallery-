@@ -15,6 +15,7 @@ Vector2 mouseDelta;
 int main(int argc, char *argv[])
 {
 	Core* engine = new Core(800, 600);
+	engine->lockCursor = true;
 
 	MainLight = std::shared_ptr<DirectionalLight>(new DirectionalLight());
 
@@ -31,15 +32,16 @@ int main(int argc, char *argv[])
 	for (int i = 0; i < numberOfCubeIndices; i++)
 		skyboxMesh->indices.push_back(cubeIndices[i]);
 
-	const std::string skyboxFront = TEXTURE_PATH + "ashcanyon_ft.png";
-	const std::string skyboxBack = TEXTURE_PATH + "ashcanyon_bk.png";
-	const std::string skyboxLeft = TEXTURE_PATH + "ashcanyon_lf.png";
-	const std::string skyboxRight = TEXTURE_PATH + "ashcanyon_rt.png";
+	
 	const std::string skyboxTop = TEXTURE_PATH + "ashcanyon_up.png";
 	const std::string skyboxBottom = TEXTURE_PATH + "ashcanyon_dn.png";
+	const std::string skyboxLeft = TEXTURE_PATH + "ashcanyon_lf.png";
+	const std::string skyboxRight = TEXTURE_PATH + "ashcanyon_rt.png";
+	const std::string skyboxFront = TEXTURE_PATH + "ashcanyon_ft.png";
+	const std::string skyboxBack = TEXTURE_PATH + "ashcanyon_bk.png";
 
 	skyboxMesh->SetMaterial(std::shared_ptr<Material>(new Material(SHADER_PATH + "skyVS.glsl", SHADER_PATH + "skyFS.glsl")));
-	skyboxMesh->GetMaterial()->SetCubeMapTextures(skyboxFront, skyboxBack, skyboxLeft, skyboxRight, skyboxTop, skyboxBottom);
+	skyboxMesh->GetMaterial()->SetCubeMapTextures(skyboxLeft, skyboxRight, skyboxTop, skyboxBottom, skyboxFront, skyboxBack);
 	skyboxMesh->GenerateBuffers();
 	//
 	//std::shared_ptr<GameObject> obj = std::shared_ptr<GameObject>(new GameObject());
@@ -70,7 +72,6 @@ int main(int argc, char *argv[])
 	//modelMesh->material->LoadTexture(TEXTURE_PATH + "texture.png");
 	//modelMesh->GenerateBuffers();
 	//GameObjects.push_back(artGalleryObj);
-
 
 	engine->Start();
 }

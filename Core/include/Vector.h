@@ -49,6 +49,13 @@ struct Vector3
 		z = 0;
 	}
 
+	Vector3(glm::vec3 v)
+	{
+		x = v.x;
+		y = v.y;
+		z = v.z;
+	}
+
 	Vector3(float a, float b, float c)
 	{
 		x = a;
@@ -59,6 +66,16 @@ struct Vector3
 	Vector3 operator+(Vector3 a)
 	{
 		return{ x + a.x, y + a.y, z + a.z };
+	}
+
+	Vector3 operator+=(Vector3 a)
+	{
+		return{ x + a.x, y + a.y, z + a.z };
+	}
+
+	Vector3 operator*(float a)
+	{
+		return{ x * a, y * a, z * a };
 	}
 
 	Vector3 operator=(glm::vec3 a)

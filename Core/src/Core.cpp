@@ -3,6 +3,7 @@
 Core::Core(int width, int height)
 {
 	std::cout << "Starting up" << std::endl;
+	lockCursor = false;
 	lighting = true;
 	WIDTH = width;
 	HEIGHT = height;
@@ -151,14 +152,14 @@ void Core::Input(SDL_Event* e)
 	if (e->type == SDL_KEYUP)
 		keysPressed[e->key.keysym.sym] = false;
 
-	int x, y;
-	SDL_GetMouseState(&x, &y);
-	mouseDelta = Vector2(x - mousePosition.x, y - mousePosition.y);
-	mousePosition = Vector2(static_cast<float>(x), static_cast<float>(y));
+	if (lockCursor)
+		SDL_SetRelativeMouseMode(SDL_TRUE);
+	else
+		SDL_SetRelativeMouseMode(SDL_FALSE);
 }
 
 void Core::Update()
-{
+{	
 	for (auto i = GameObjects.begin(); i != GameObjects.end(); ++i)
 	{
 		for (std::shared_ptr<Component> j : (*i)->GetComponents())
@@ -173,6 +174,12 @@ void Core::Update()
 
 	MainCamera->Update();
 	SkyBox->transform.position = MainCamera->transform.position;
+
+	int x, y;
+	SDL_GetMouseState(&x, &y);
+	mousePosition = Vector2(static_cast<float>(x), static_cast<float>(y));
+	SDL_GetRelativeMouseState(&x, &y);
+	mouseDelta = Vector2(x, y);
 }
 
 void Core::Render()

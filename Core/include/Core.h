@@ -13,6 +13,7 @@
 class Core
 {
 public:
+	bool lockCursor;
 	bool lighting;
 	int WIDTH;
 	int HEIGHT;
