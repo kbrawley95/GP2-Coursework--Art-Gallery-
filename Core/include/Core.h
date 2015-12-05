@@ -24,10 +24,13 @@ public:
 	void Input(SDL_Event* e);
 	void Update();
 	void Render();
+	void UpdateScreen();
 
 private:
 	SDL_Window* window;
 	SDL_GLContext context;
+
+	int count = 0;
 
 	void RenderGameObjects(std::shared_ptr<GameObject> g);
 };

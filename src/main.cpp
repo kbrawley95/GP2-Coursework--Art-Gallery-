@@ -33,19 +33,19 @@ int main(int argc, char *argv[])
 		skyboxMesh->indices.push_back(cubeIndices[i]);
 
 	
-	const std::string skyboxTop = TEXTURE_PATH + "ashcanyon_up.png";
-	const std::string skyboxBottom = TEXTURE_PATH + "ashcanyon_dn.png";
-	const std::string skyboxLeft = TEXTURE_PATH + "ashcanyon_lf.png";
-	const std::string skyboxRight = TEXTURE_PATH + "ashcanyon_rt.png";
-	const std::string skyboxFront = TEXTURE_PATH + "ashcanyon_ft.png";
-	const std::string skyboxBack = TEXTURE_PATH + "ashcanyon_bk.png";
+	const std::string skyboxTop = TEXTURE_PATH + "city_top.png";
+	const std::string skyboxBottom = TEXTURE_PATH + "city_top.png";
+	const std::string skyboxLeft = TEXTURE_PATH + "city_right.png";
+	const std::string skyboxRight = TEXTURE_PATH + "city_left.png";
+	const std::string skyboxFront = TEXTURE_PATH + "city_front.png";
+	const std::string skyboxBack = TEXTURE_PATH + "city_back.png";
 
 	skyboxMesh->SetMaterial(std::shared_ptr<Material>(new Material(SHADER_PATH + "skyVS.glsl", SHADER_PATH + "skyFS.glsl")));
 	skyboxMesh->GetMaterial()->SetCubeMapTextures(skyboxLeft, skyboxRight, skyboxTop, skyboxBottom, skyboxFront, skyboxBack);
 	skyboxMesh->GenerateBuffers();
 	//
 	//std::shared_ptr<GameObject> obj = std::shared_ptr<GameObject>(new GameObject());
-	//obj->transform.position = Vector3(0, 0, -30);
+	//obj->transform.position = Vector3(0, 0, -30);w
 	//std::shared_ptr<Mesh> m = obj->AddComponent<Mesh>();
 	//m->LoadFBX(MODEL_PATH + "utah-teapot.fbx");
 	//m->material = std::shared_ptr<Material>(new Material(SHADER_PATH + "specularVS.glsl", SHADER_PATH + "specularFS.glsl"));
@@ -64,6 +64,16 @@ int main(int argc, char *argv[])
 	obj2->transform.position = Vector3(0, 0, 0);
 	obj2->transform.rotation = Vector3(0, 180, 0);
 
+	/*std::shared_ptr<GameObject> pickup = std::shared_ptr<GameObject>(new GameObject());
+	std::shared_ptr<Mesh> pickMesh = pickup->AddComponent<Mesh>();
+	std::shared_ptr<Material>pickMat = std::shared_ptr<Material>(new Material(SHADER_PATH + "textureVS.glsl", SHADER_PATH + "textureFS.glsl"));
+	pickMat->LoadTexture(TEXTURE_PATH + "texture.png");
+	pickMesh->LoadFBX(MODEL_PATH + "Gallery.fbx", pickMat);
+	pickMesh->GenerateBuffers();
+	GameObjects.push_back(pickup);
+	obj2->transform.position = Vector3(0, 0, -40);
+	obj2->transform.rotation = Vector3(0, 0, 0);*/
+
 	//std::shared_ptr<GameObject> artGalleryObj = std::shared_ptr<GameObject>(new GameObject());
 	//artGalleryObj->transform.position = Vector3(15, 0, 0);
 	//std::shared_ptr<Mesh> modelMesh = artGalleryObj->AddComponent<Mesh>();
@@ -72,6 +82,9 @@ int main(int argc, char *argv[])
 	//modelMesh->material->LoadTexture(TEXTURE_PATH + "texture.png");
 	//modelMesh->GenerateBuffers();
 	//GameObjects.push_back(artGalleryObj);
+
+	
+	
 
 	engine->Start();
 }

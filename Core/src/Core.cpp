@@ -7,6 +7,7 @@ Core::Core(int width, int height)
 	lighting = true;
 	WIDTH = width;
 	HEIGHT = height;
+	
 
 	//SDL
 	if (SDL_Init(SDL_INIT_EVERYTHING) != 0)
@@ -99,6 +100,8 @@ Core::~Core()
 
 void Core::Start()
 {
+	
+
 	std::cout << std::endl << "[Main Loop Started]" << std::endl;
 
 	for (auto i = GameObjects.begin(); i != GameObjects.end(); ++i)
@@ -128,6 +131,11 @@ void Core::Start()
 				case SDLK_ESCAPE:
 					run=false;
 					break;
+
+				case SDLK_TAB:
+					UpdateScreen();
+					
+					break;
 				}
 			}
 			Input(&events);
@@ -156,6 +164,22 @@ void Core::Input(SDL_Event* e)
 		SDL_SetRelativeMouseMode(SDL_TRUE);
 	else
 		SDL_SetRelativeMouseMode(SDL_FALSE);
+
+}
+
+void Core:: UpdateScreen()
+{
+	if (count == 0)
+	{
+		SDL_SetWindowFullscreen(window, SDL_TRUE);
+		count++;
+	}
+	else if (count==1)
+	{
+		SDL_SetWindowFullscreen(window, SDL_FALSE);
+		count--;
+	}
+		
 }
 
 void Core::Update()
@@ -172,6 +196,7 @@ void Core::Update()
 		}
 	}
 
+	
 	MainCamera->Update();
 	SkyBox->transform.position = MainCamera->transform.position;
 
