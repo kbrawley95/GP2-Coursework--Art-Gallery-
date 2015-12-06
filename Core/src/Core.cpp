@@ -134,7 +134,6 @@ void Core::Start()
 
 				case SDLK_TAB:
 					UpdateScreen();
-					
 					break;
 				}
 			}
@@ -242,6 +241,9 @@ void Core::RenderGameObjects(std::shared_ptr<GameObject> g)
 		GLint MVPLocation = glGetUniformLocation(m->GetMaterial()->GetShader(), "MVP");
 		GLint texture0Location = glGetUniformLocation(m->GetMaterial()->GetShader(), "texture0");
 		GLint cubeTexture = glGetUniformLocation(m->GetMaterial()->GetShader(), "cubeTexture");
+		GLint modelLocation = glGetUniformLocation(m->GetMaterial()->GetShader(), "Model");
+
+		glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(g->GetMVPMatrix()));
 
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, m->GetMaterial()->GetTexture());
@@ -267,6 +269,7 @@ void Core::RenderGameObjects(std::shared_ptr<GameObject> g)
 			GLint specularLightMaterialLocation = glGetUniformLocation(m->GetMaterial()->GetShader(), "specularMaterialColour");
 			GLint specularPowerLocation = glGetUniformLocation(m->GetMaterial()->GetShader(), "specularPower");
 
+			
 
 			glUniform4fv(ambientLightColourLocation, 1, value_ptr(MainLight->ambientLightColor.ConvertToVec4()));
 			glUniform4fv(ambientMaterialColourLocation, 1, value_ptr(m->GetMaterial()->ambientMaterial.ConvertToVec4()));

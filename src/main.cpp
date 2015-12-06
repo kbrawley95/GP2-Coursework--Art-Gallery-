@@ -21,6 +21,7 @@ int main(int argc, char *argv[])
 
 	MainCamera = std::shared_ptr<Camera>(new Camera());
 	MainCamera->transform.position = Vector3(0, 0, -50);
+	MainCamera->transform.rotation = Vector3(0, 0, 0);
 
 	SkyBox = std::shared_ptr<GameObject>(new GameObject());
 	SkyBox->transform.position = Vector3(0, 0, -40);
@@ -43,17 +44,16 @@ int main(int argc, char *argv[])
 	skyboxMesh->SetMaterial(std::shared_ptr<Material>(new Material(SHADER_PATH + "skyVS.glsl", SHADER_PATH + "skyFS.glsl")));
 	skyboxMesh->GetMaterial()->SetCubeMapTextures(skyboxLeft, skyboxRight, skyboxTop, skyboxBottom, skyboxFront, skyboxBack);
 	skyboxMesh->GenerateBuffers();
-	//
-	//std::shared_ptr<GameObject> obj = std::shared_ptr<GameObject>(new GameObject());
-	//obj->transform.position = Vector3(0, 0, -30);w
-	//std::shared_ptr<Mesh> m = obj->AddComponent<Mesh>();
-	//m->LoadFBX(MODEL_PATH + "utah-teapot.fbx");
-	//m->material = std::shared_ptr<Material>(new Material(SHADER_PATH + "specularVS.glsl", SHADER_PATH + "specularFS.glsl"));
-	////m->material->LoadTexture(TEXTURE_PATH + "texture.png");
-	//m->GenerateBuffers();
-	//GameObjects.push_back(obj);
-	//
 
+	//Teapot
+	std::shared_ptr<GameObject> obj = std::shared_ptr<GameObject>(new GameObject());
+	std::shared_ptr<Mesh> m = obj->AddComponent<Mesh>();
+	std::shared_ptr<Material> objMat = std::shared_ptr<Material>(new Material(SHADER_PATH + "specularReflectionVS.glsl", SHADER_PATH + "specularReflectionFS.glsl"));
+	m->LoadFBX(MODEL_PATH + "utah-teapot.fbx", objMat);
+	m->GenerateBuffers();
+	GameObjects.push_back(obj);
+	obj->transform.position = Vector3(0,0,-10);
+	
 	std::shared_ptr<GameObject> obj2 = std::shared_ptr<GameObject>(new GameObject());
 	std::shared_ptr<Mesh> m2 = obj2->AddComponent<Mesh>();
 	std::shared_ptr<Material> mat = std::shared_ptr<Material>(new Material(SHADER_PATH + "textureVS.glsl", SHADER_PATH + "textureFS.glsl"));
@@ -63,8 +63,8 @@ int main(int argc, char *argv[])
 	GameObjects.push_back(obj2);
 	obj2->transform.position = Vector3(0, 0, 0);
 	obj2->transform.rotation = Vector3(0, 180, 0);
-
-	/*std::shared_ptr<GameObject> pickup = std::shared_ptr<GameObject>(new GameObject());
+/*
+	std::shared_ptr<GameObject> pickup = std::shared_ptr<GameObject>(new GameObject());
 	std::shared_ptr<Mesh> pickMesh = pickup->AddComponent<Mesh>();
 	std::shared_ptr<Material>pickMat = std::shared_ptr<Material>(new Material(SHADER_PATH + "textureVS.glsl", SHADER_PATH + "textureFS.glsl"));
 	pickMat->LoadTexture(TEXTURE_PATH + "texture.png");
@@ -83,8 +83,6 @@ int main(int argc, char *argv[])
 	//modelMesh->GenerateBuffers();
 	//GameObjects.push_back(artGalleryObj);
 
-	
-	
 
 	engine->Start();
 }

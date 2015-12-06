@@ -2,9 +2,9 @@
 
 Material::Material(std::string vsPath, std::string fsPath)
 {
-	ambientMaterial = Vector4(0.3f, 0.3f, 0.3f, 1.0f);
-	diffuseMaterial = Vector4(0.8f, 0.8f, 0.8f, 1.0f);
-	specularMaterial = Vector4(1.0f, 1.0f, 1.0f, 1.0f);
+	ambientMaterial = glm::vec4(1.0f, 0.3f, 0.3f, 1.0f);
+	diffuseMaterial = glm::vec4(1.0f, 0.0f, 0.0f, 1.0f);
+	specularMaterial = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
 	specularPower = 25.0f;
 
 	environmentMap = 0;
