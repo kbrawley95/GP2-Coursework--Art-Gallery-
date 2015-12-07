@@ -44,6 +44,22 @@ public:
 	{
 		return children;
 	}
+	std::shared_ptr<GameObject> GetChildByName(std::string name, bool recursive)
+	{
+		for (auto i = children.begin(); i != children.end(); ++i)
+		{
+			if ((*i)->name == name)
+				return (*i);
+
+			if (recursive)
+			{
+				std::shared_ptr<GameObject> obj = (*i)->GetChildByName(name, true);
+				if (obj != nullptr)
+					return obj;
+			}
+		}
+		return nullptr;
+	}
 	std::shared_ptr<GameObject> GetChild(int x)
 	{
 		return children[x];

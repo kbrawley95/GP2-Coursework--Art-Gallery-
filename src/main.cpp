@@ -36,7 +36,6 @@ int main(int argc, char *argv[])
 		skyboxMesh->vertices.push_back(cubeVerts[i]);
 	for (int i = 0; i < numberOfCubeIndices; i++)
 		skyboxMesh->indices.push_back(cubeIndices[i]);
-
 	
 	const std::string skyboxTop = TEXTURE_PATH + "city_top.png";
 	const std::string skyboxBottom = TEXTURE_PATH + "city_top.png";
