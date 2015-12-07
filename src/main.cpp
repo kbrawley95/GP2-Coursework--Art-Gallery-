@@ -14,15 +14,19 @@ Vector2 mouseDelta;
 
 int main(int argc, char *argv[])
 {
+	//Setup Engine
 	Core* engine = new Core(800, 600);
 	engine->lockCursor = true;
 
+	//Main Light
 	MainLight = std::shared_ptr<DirectionalLight>(new DirectionalLight());
 
+	//Main camera
 	MainCamera = std::shared_ptr<Camera>(new Camera());
 	MainCamera->transform.position = Vector3(0, 0, -50);
 	MainCamera->transform.rotation = Vector3(0, 0, 0);
 
+	//Setup skybox
 	SkyBox = std::shared_ptr<GameObject>(new GameObject());
 	SkyBox->transform.position = Vector3(0, 0, -40);
 	std::shared_ptr<Mesh> skyboxMesh = SkyBox->AddComponent<Mesh>();
@@ -44,9 +48,8 @@ int main(int argc, char *argv[])
 	skyboxMesh->SetMaterial(std::shared_ptr<Material>(new Material(SHADER_PATH + "skyVS.glsl", SHADER_PATH + "skyFS.glsl")));
 	skyboxMesh->GetMaterial()->SetCubeMapTextures(skyboxLeft, skyboxRight, skyboxTop, skyboxBottom, skyboxFront, skyboxBack);
 	skyboxMesh->GenerateBuffers();
-
 	
-	//Teapot
+	//armored car
 	std::shared_ptr<GameObject> obj = std::shared_ptr<GameObject>(new GameObject());
 	std::shared_ptr<Mesh> m = obj->AddComponent<Mesh>();
 	std::shared_ptr<Material> objMat = std::shared_ptr<Material>(new Material(SHADER_PATH + "textureVS.glsl", SHADER_PATH + "textureFS.glsl"));
@@ -55,35 +58,17 @@ int main(int argc, char *argv[])
 	GameObjects.push_back(obj);
 	obj->transform.position = Vector3(0,0,-10);
 
-	//Armored Car
+	//pickup truck
 	std::shared_ptr<GameObject> obj2 = std::shared_ptr<GameObject>(new GameObject());
 	std::shared_ptr<Mesh> m2 = obj2->AddComponent<Mesh>();
-	std::shared_ptr<Material> mat = std::shared_ptr<Material>(new Material(SHADER_PATH + "specularReflectionVS.glsl", SHADER_PATH + "specularReflectionFS.glsl"));
-	mat->LoadTexture(TEXTURE_PATH + "armoredrecon_diff.png");
-	m2->LoadFBX(MODEL_PATH + "art_gallery.fbx", mat);
+	std::shared_ptr<Material> mat = std::shared_ptr<Material>(new Material(SHADER_PATH + "textureVS.glsl", SHADER_PATH + "textureFS.glsl"));
+	mat->LoadTexture(TEXTURE_PATH + "truck_color-blue.png");
+	m2->LoadFBX(MODEL_PATH + "L200-FBX.fbx", mat);
 	GameObjects.push_back(obj2);
-	obj2->transform.position = Vector3(0, 0, 0);
-	obj2->transform.rotation = Vector3(0, 180, 0);
+	obj2->transform.position = Vector3(0, -3, 0);
+	obj2->transform.rotation = Vector3(0, 0, 0);
+	obj2->transform.scale = Vector3(0.01f, 0.01f, 0.01f);
 
-/*
-	std::shared_ptr<GameObject> pickup = std::shared_ptr<GameObject>(new GameObject());
-	std::shared_ptr<Mesh> pickMesh = pickup->AddComponent<Mesh>();
-	std::shared_ptr<Material>pickMat = std::shared_ptr<Material>(new Material(SHADER_PATH + "textureVS.glsl", SHADER_PATH + "textureFS.glsl"));
-	pickMat->LoadTexture(TEXTURE_PATH + "texture.png");
-	pickMesh->LoadFBX(MODEL_PATH + "Gallery.fbx", pickMat);
-	pickMesh->GenerateBuffers();
-	GameObjects.push_back(pickup);
-	obj2->transform.position = Vector3(0, 0, -40);
-	obj2->transform.rotation = Vector3(0, 0, 0);*/
-
-	//std::shared_ptr<GameObject> artGalleryObj = std::shared_ptr<GameObject>(new GameObject());
-	//artGalleryObj->transform.position = Vector3(15, 0, 0);
-	//std::shared_ptr<Mesh> modelMesh = artGalleryObj->AddComponent<Mesh>();
-	//modelMesh->LoadFBX(MODEL_PATH + "Art_Gallery1.fbx");
-	//modelMesh->material = std::shared_ptr<Material>(new Material(SHADER_PATH + "textureVS.glsl", SHADER_PATH + "textureFS.glsl"));
-	//modelMesh->material->LoadTexture(TEXTURE_PATH + "texture.png");
-	//modelMesh->GenerateBuffers();
-	//GameObjects.push_back(artGalleryObj);
-
+	//Start Game
 	engine->Start();
 }

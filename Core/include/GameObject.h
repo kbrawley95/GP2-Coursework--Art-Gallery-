@@ -15,12 +15,13 @@ public:
 	Transform transform;
 	std::shared_ptr<GameObject> parent;
 
-	glm::mat4 GetMVPMatrix()
+	glm::mat4x4 GetMVPMatrix()
 	{
-		if (parent != nullptr)
-			return MainCamera->GetProjectionMatrix() * MainCamera->GetViewMatrix() * (parent->transform.GetWorldMatrix() * transform.GetWorldMatrix());
-		else
-			return MainCamera->GetProjectionMatrix() * MainCamera->GetViewMatrix() * transform.GetWorldMatrix();
+		glm::mat4x4 MVP = MainCamera->GetProjectionMatrix() * MainCamera->GetViewMatrix();
+
+		MVP = MVP * MultiplyParentMatrix(shared_from_this(), transform.GetWorldMatrix());
+
+		return MVP;
 	}
 
 	GameObject()
@@ -81,6 +82,17 @@ public:
 private:
 	std::vector<std::shared_ptr<Component>> components;
 	std::vector<std::shared_ptr<GameObject>> children;
+
+	glm::mat4x4 MultiplyParentMatrix(std::shared_ptr<GameObject> child, glm::mat4x4 modelMatrix)
+	{
+		if (child->parent == nullptr)
+			return modelMatrix;
+		else
+		{
+			modelMatrix = child->parent->transform.GetWorldMatrix() * modelMatrix;
+			return MultiplyParentMatrix(child->parent, modelMatrix);
+		}
+	}
 };
 
 #endif
