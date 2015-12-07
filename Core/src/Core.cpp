@@ -218,13 +218,6 @@ void Core::Render()
 	for (auto i = GameObjects.begin(); i != GameObjects.end(); ++i)
 	{
 		RenderGameObjects((*i));
-		for (std::shared_ptr<GameObject> j : (*i)->GetChildren())
-		{
-			RenderGameObjects(j);
-
-			for (std::shared_ptr<Component> K : (*i)->GetComponents())
-				K->PostRender();
-		}
 
 		for (std::shared_ptr<Component> K : (*i)->GetComponents())
 			K->PostRender();
@@ -288,5 +281,13 @@ void Core::RenderGameObjects(std::shared_ptr<GameObject> g)
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m->EBO);
 
 		glDrawElements(GL_TRIANGLES, m->indices.size(), GL_UNSIGNED_INT, 0);
+	}
+
+	for (std::shared_ptr<GameObject> j : g->GetChildren())
+	{
+		RenderGameObjects(j);
+
+		for (std::shared_ptr<Component> K : g->GetComponents())
+			K->PostRender();
 	}
 }

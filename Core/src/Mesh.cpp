@@ -161,10 +161,10 @@ FbxString Mesh::GetAttributeTypeName(FbxNodeAttribute::EType type)
 
 void Mesh::ProcessNode(FbxNode* node, std::shared_ptr<GameObject> parent)
 {
-	std::shared_ptr<GameObject> child = std::shared_ptr<GameObject>(new GameObject());
+	const char* nodeName = node->GetName();
+	std::shared_ptr<GameObject> child = std::shared_ptr<GameObject>(new GameObject(nodeName));
 	child->AddComponent<Mesh>()->material = material;
 	parent->AddChild(child);
-	const char* nodeName = node->GetName();
 	FbxDouble3 translation = node->LclTranslation.Get();
 	FbxDouble3 rotation = node->LclRotation.Get();
 	FbxDouble3 scaling = node->LclScaling.Get();
@@ -226,6 +226,8 @@ void Mesh::ProcessMesh(FbxMesh* mesh, std::shared_ptr<GameObject> child)
 
 	for (int i = 0; i < numIndices; i++)
 		child->GetComponent<Mesh>()->indices.push_back(inds[i]);
+
+	child->GetComponent<Mesh>()->GenerateBuffers();
 
 	if (verts)
 	{

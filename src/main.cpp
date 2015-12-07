@@ -45,24 +45,26 @@ int main(int argc, char *argv[])
 	skyboxMesh->GetMaterial()->SetCubeMapTextures(skyboxLeft, skyboxRight, skyboxTop, skyboxBottom, skyboxFront, skyboxBack);
 	skyboxMesh->GenerateBuffers();
 
+	
 	//Teapot
 	std::shared_ptr<GameObject> obj = std::shared_ptr<GameObject>(new GameObject());
 	std::shared_ptr<Mesh> m = obj->AddComponent<Mesh>();
-	std::shared_ptr<Material> objMat = std::shared_ptr<Material>(new Material(SHADER_PATH + "specularReflectionVS.glsl", SHADER_PATH + "specularReflectionFS.glsl"));
-	m->LoadFBX(MODEL_PATH + "utah-teapot.fbx", objMat);
-	m->GenerateBuffers();
+	std::shared_ptr<Material> objMat = std::shared_ptr<Material>(new Material(SHADER_PATH + "textureVS.glsl", SHADER_PATH + "textureFS.glsl"));
+	objMat->LoadTexture(TEXTURE_PATH + "armoredrecon_diff.png");
+	m->LoadFBX(MODEL_PATH + "armoredrecon.fbx", objMat);
 	GameObjects.push_back(obj);
 	obj->transform.position = Vector3(0,0,-10);
-	
+
+	//Armored Car
 	std::shared_ptr<GameObject> obj2 = std::shared_ptr<GameObject>(new GameObject());
 	std::shared_ptr<Mesh> m2 = obj2->AddComponent<Mesh>();
-	std::shared_ptr<Material> mat = std::shared_ptr<Material>(new Material(SHADER_PATH + "textureVS.glsl", SHADER_PATH + "textureFS.glsl"));
+	std::shared_ptr<Material> mat = std::shared_ptr<Material>(new Material(SHADER_PATH + "specularReflectionVS.glsl", SHADER_PATH + "specularReflectionFS.glsl"));
 	mat->LoadTexture(TEXTURE_PATH + "armoredrecon_diff.png");
-	m2->LoadFBX(MODEL_PATH + "armoredrecon.fbx", mat);
-	m2->GenerateBuffers();
+	m2->LoadFBX(MODEL_PATH + "art_gallery.fbx", mat);
 	GameObjects.push_back(obj2);
 	obj2->transform.position = Vector3(0, 0, 0);
 	obj2->transform.rotation = Vector3(0, 180, 0);
+
 /*
 	std::shared_ptr<GameObject> pickup = std::shared_ptr<GameObject>(new GameObject());
 	std::shared_ptr<Mesh> pickMesh = pickup->AddComponent<Mesh>();
@@ -82,7 +84,6 @@ int main(int argc, char *argv[])
 	//modelMesh->material->LoadTexture(TEXTURE_PATH + "texture.png");
 	//modelMesh->GenerateBuffers();
 	//GameObjects.push_back(artGalleryObj);
-
 
 	engine->Start();
 }
