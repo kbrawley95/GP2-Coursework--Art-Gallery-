@@ -68,7 +68,7 @@ struct Vector3
 		return{ x + a.x, y + a.y, z + a.z };
 	}
 
-	Vector3 operator+=(Vector3 a)
+	Vector3 operator+=(const Vector3 a)
 	{
 		return{ x + a.x, y + a.y, z + a.z };
 	}
@@ -86,6 +86,11 @@ struct Vector3
 	glm::vec3 ConvertToVec3()
 	{
 		return glm::vec3(x, y, z);
+	}
+
+	std::string ToString()
+	{
+		return "(" + std::to_string(x) + "," + std::to_string(y) + "," + std::to_string(z) + ")";
 	}
 };
 

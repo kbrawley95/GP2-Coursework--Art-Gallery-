@@ -9,30 +9,40 @@
 #include "Mesh.h"
 #include "DirectionalLight.h"
 #include "Input.h"
+#include "Time.h"
+#include "Cube.h"
 
 class Core
 {
 public:
 	bool lockCursor;
-	bool lighting;
+	bool debugMode;
+
 	int WIDTH;
 	int HEIGHT;
+	int FPS;
 	Core(int width, int height);
 	~Core();
 
 	void Start();
-	void Input(SDL_Event* e);
-	void Update();
-	void Render();
-	void UpdateScreen();
+	void ChangeResolution(int w, int h, bool fullscreen);
+	std::shared_ptr<GameObject> Instantiate();
+	void SetSkyBox(std::string front, std::string back, std::string left, std::string right, std::string top, std::string bottom);
 
 private:
 	SDL_Window* window;
 	SDL_GLContext context;
+	int currentTime;
+	int prevTime;
 
 	int count = 0;
+	int fpsCounter = 0;
+	int fpsTimer = 0;
 
 	void RenderGameObjects(std::shared_ptr<GameObject> g);
+	void Update();
+	void Render();
+	void Input(SDL_Event* e);
 };
 
 #endif

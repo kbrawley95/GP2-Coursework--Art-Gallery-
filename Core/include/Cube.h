@@ -6,7 +6,7 @@
 
 using namespace glm;
 
-Vertex cubeVerts[] = {
+static const Vertex cubeVerts[] = {
 	//Front
 	{ vec3(-10.0f, 10.0f, 10.0f),
 	vec4(1.0f, 0.0f, 1.0f, 1.0f), vec2(0.0f, 0.0f), vec3(-0.3f,0.3f,0.3f) },// Top Left
@@ -36,7 +36,7 @@ Vertex cubeVerts[] = {
 
 };
 
-int cubeIndices[] = {
+static const int cubeIndices[] = {
 	//front
 	0, 1, 2,
 	0, 3, 2,
@@ -62,6 +62,6 @@ int cubeIndices[] = {
 	4, 7, 6
 };
 
-const int numberOfCubeIndices = 36;
-const int numberOfCubeVerts = 8;
+static const int numberOfCubeIndices = 36;
+static const int numberOfCubeVerts = 8;
 #endif

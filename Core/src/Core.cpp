@@ -4,10 +4,9 @@ Core::Core(int width, int height)
 {
 	std::cout << "Starting up" << std::endl;
 	lockCursor = false;
-	lighting = true;
+	debugMode = true;
 	WIDTH = width;
 	HEIGHT = height;
-	
 
 	//SDL
 	if (SDL_Init(SDL_INIT_EVERYTHING) != 0)
@@ -133,7 +132,7 @@ void Core::Start()
 					break;
 
 				case SDLK_TAB:
-					UpdateScreen();
+					ChangeResolution(2560, 1440, true);
 					break;
 				}
 			}
@@ -147,6 +146,46 @@ void Core::Start()
 		SDL_GL_SwapWindow(window);
 	}
 }
+
+std::shared_ptr<GameObject> Core::Instantiate()
+{
+	std::shared_ptr<GameObject> g = std::shared_ptr<GameObject>(new GameObject());
+	GameObjects.push_back(g);
+	return g;
+}
+
+void Core:: ChangeResolution(int w, int h, bool fullscreen)
+{
+	WIDTH = w;
+	HEIGHT = h;
+	MainCamera->aspectRatio = w / h;
+	SDL_SetWindowSize(window, WIDTH, HEIGHT);
+	glViewport(0, 0, (GLsizei)WIDTH, (GLsizei)HEIGHT);
+	if (fullscreen)
+		SDL_SetWindowFullscreen(window, SDL_TRUE);
+	else
+		SDL_SetWindowFullscreen(window, SDL_FALSE);	
+}
+
+void Core::SetSkyBox(std::string front, std::string back, std::string left, std::string right, std::string top, std::string bottom)
+{
+	SkyBox = std::shared_ptr<GameObject>(new GameObject());
+	SkyBox->transform.position = Vector3(0, 0, -40);
+	std::shared_ptr<Mesh> skyboxMesh = SkyBox->AddComponent<Mesh>();
+	skyboxMesh->vertices.clear();
+	skyboxMesh->indices.clear();
+	for (int i = 0; i < numberOfCubeVerts; i++)
+		skyboxMesh->vertices.push_back(cubeVerts[i]);
+	for (int i = 0; i < numberOfCubeIndices; i++)
+		skyboxMesh->indices.push_back(cubeIndices[i]);
+
+	skyboxMesh->SetMaterial(std::shared_ptr<Material>(new Material(SHADER_PATH + "skyVS.glsl", SHADER_PATH + "skyFS.glsl")));
+	skyboxMesh->GetMaterial()->SetCubeMapTextures(left, right, top, bottom, front, back);
+	skyboxMesh->GenerateBuffers();
+}
+
+
+//PRIVATE
 
 void Core::Input(SDL_Event* e)
 {
@@ -166,21 +205,6 @@ void Core::Input(SDL_Event* e)
 
 }
 
-void Core:: UpdateScreen()
-{
-	if (count == 0)
-	{
-		SDL_SetWindowFullscreen(window, SDL_TRUE);
-		count++;
-	}
-	else if (count==1)
-	{
-		SDL_SetWindowFullscreen(window, SDL_FALSE);
-		count--;
-	}
-		
-}
-
 void Core::Update()
 {	
 	for (auto i = GameObjects.begin(); i != GameObjects.end(); ++i)
@@ -196,14 +220,31 @@ void Core::Update()
 	}
 
 	
+	//Camera & Skybox
 	MainCamera->Update();
 	SkyBox->transform.position = MainCamera->transform.position;
 
+	//Mouse
 	int x, y;
 	SDL_GetMouseState(&x, &y);
 	mousePosition = Vector2(static_cast<float>(x), static_cast<float>(y));
 	SDL_GetRelativeMouseState(&x, &y);
 	mouseDelta = Vector2(x, y);
+
+	//Time
+	prevTime = currentTime;
+	currentTime = SDL_GetTicks();
+	deltaTime = (currentTime - prevTime) / 1000.0f;
+
+	//Calculate FPS
+	if (fpsTimer < currentTime)
+	{
+		FPS = fpsCounter;
+		fpsTimer = currentTime + 1000;
+		fpsCounter = 0;
+	}
+	else
+		fpsCounter++;
 }
 
 void Core::Render()
@@ -248,34 +289,32 @@ void Core::RenderGameObjects(std::shared_ptr<GameObject> g)
 		glUniform1i(texture0Location, 0);
 		glUniform1i(cubeTexture, 1);
 
+		//Lighting
+		GLint ambientLightColourLocation = glGetUniformLocation(m->GetMaterial()->GetShader(), "ambientLightColour");
+		GLint ambientMaterialColourLocation = glGetUniformLocation(m->GetMaterial()->GetShader(), "ambientMaterialColour");
 
-		if (lighting)
-		{
-			GLint ambientLightColourLocation = glGetUniformLocation(m->GetMaterial()->GetShader(), "ambientLightColour");
-			GLint ambientMaterialColourLocation = glGetUniformLocation(m->GetMaterial()->GetShader(), "ambientMaterialColour");
+		GLint diffuseLightColourLocation = glGetUniformLocation(m->GetMaterial()->GetShader(), "diffuseLightColour");
+		GLint diffuseLightMaterialLocation = glGetUniformLocation(m->GetMaterial()->GetShader(), "diffuseMaterialColour");
+		GLint lightDirectionLocation = glGetUniformLocation(m->GetMaterial()->GetShader(), "lightDirection");
 
-			GLint diffuseLightColourLocation = glGetUniformLocation(m->GetMaterial()->GetShader(), "diffuseLightColour");
-			GLint diffuseLightMaterialLocation = glGetUniformLocation(m->GetMaterial()->GetShader(), "diffuseMaterialColour");
-			GLint lightDirectionLocation = glGetUniformLocation(m->GetMaterial()->GetShader(), "lightDirection");
-
-			GLint specularLightColourLocation = glGetUniformLocation(m->GetMaterial()->GetShader(), "specularLightColour");
-			GLint specularLightMaterialLocation = glGetUniformLocation(m->GetMaterial()->GetShader(), "specularMaterialColour");
-			GLint specularPowerLocation = glGetUniformLocation(m->GetMaterial()->GetShader(), "specularPower");
+		GLint specularLightColourLocation = glGetUniformLocation(m->GetMaterial()->GetShader(), "specularLightColour");
+		GLint specularLightMaterialLocation = glGetUniformLocation(m->GetMaterial()->GetShader(), "specularMaterialColour");
+		GLint specularPowerLocation = glGetUniformLocation(m->GetMaterial()->GetShader(), "specularPower");
 
 			
 
-			glUniform4fv(ambientLightColourLocation, 1, value_ptr(MainLight->ambientLightColor.ConvertToVec4()));
-			glUniform4fv(ambientMaterialColourLocation, 1, value_ptr(m->GetMaterial()->ambientMaterial.ConvertToVec4()));
+		glUniform4fv(ambientLightColourLocation, 1, value_ptr(MainLight->ambientLightColor.ConvertToVec4()));
+		glUniform4fv(ambientMaterialColourLocation, 1, value_ptr(m->GetMaterial()->ambientMaterial.ConvertToVec4()));
 
-			glUniform4fv(diffuseLightColourLocation, 1, value_ptr(MainLight->diffuseLightColor.ConvertToVec4()));
-			glUniform4fv(diffuseLightMaterialLocation, 1, value_ptr(m->GetMaterial()->diffuseMaterial.ConvertToVec4()));
-			glUniform3fv(lightDirectionLocation, 1, value_ptr(MainLight->direction.ConvertToVec3()));
+		glUniform4fv(diffuseLightColourLocation, 1, value_ptr(MainLight->diffuseLightColor.ConvertToVec4()));
+		glUniform4fv(diffuseLightMaterialLocation, 1, value_ptr(m->GetMaterial()->diffuseMaterial.ConvertToVec4()));
+		glUniform3fv(lightDirectionLocation, 1, value_ptr(MainLight->direction.ConvertToVec3()));
 
-			glUniform4fv(specularLightColourLocation, 1, value_ptr(MainLight->specularLightColor.ConvertToVec4()));
-			glUniform4fv(specularLightMaterialLocation, 1, value_ptr(m->GetMaterial()->specularMaterial.ConvertToVec4()));
-			glUniform1f(specularPowerLocation, m->GetMaterial()->specularPower);
-		}
+		glUniform4fv(specularLightColourLocation, 1, value_ptr(MainLight->specularLightColor.ConvertToVec4()));
+		glUniform4fv(specularLightMaterialLocation, 1, value_ptr(m->GetMaterial()->specularMaterial.ConvertToVec4()));
+		glUniform1f(specularPowerLocation, m->GetMaterial()->specularPower);
 
+		//Draw Shit
 		glBindVertexArray(m->VAO);
 		glBindBuffer(GL_ARRAY_BUFFER, m->VBO);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m->EBO);

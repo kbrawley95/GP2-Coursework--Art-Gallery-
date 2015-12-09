@@ -4,6 +4,7 @@
 #include "Common.h"
 #include "Transform.h"
 #include "Input.h"
+#include "Time.h"
 
 class Camera
 {
@@ -14,35 +15,35 @@ public:
 	float zNear;
 	float zFar;
 
-	//Keyboard State
-	int currentTime, prevTime;
-	float deltaTime;
-
 	void Update()
-	{
-		prevTime = currentTime;
-		currentTime = SDL_GetTicks();
-		deltaTime = (currentTime - prevTime) / 1000.0f;
-		KeyboardState();
-	}
-
-	void KeyboardState()
 	{
 		if (keysPressed[SDLK_a])
 		{
-			transform.position.x += 10.0f*deltaTime;
+			Vector3 Translate = Vector3(glm::vec3(transform.GetWorldMatrix()[0]) * 10.0f * deltaTime);
+			transform.position.x += Translate.x;
+			transform.position.y += Translate.y;
+			transform.position.z += Translate.z;
 		}
 		else if (keysPressed[SDLK_d])
 		{
-			transform.position.x -= 10.0f*deltaTime;
+			Vector3 Translate = Vector3(glm::vec3(transform.GetWorldMatrix()[0]) * 10.0f * deltaTime);
+			transform.position.x -= Translate.x;
+			transform.position.y -= Translate.y;
+			transform.position.z -= Translate.z;
 		}
 		else if (keysPressed[SDLK_w])
 		{
-			transform.position.z += 10.0f*deltaTime;
+			Vector3 Translate = Vector3(glm::vec3(transform.GetWorldMatrix()[2]) * 10.0f * deltaTime);
+			transform.position.x += Translate.x;
+			transform.position.y += Translate.y;
+			transform.position.z += Translate.z;
 		}
 		else if (keysPressed[SDLK_s])
 		{
-			transform.position.z -= 10.0f*deltaTime;
+			Vector3 Translate = Vector3(glm::vec3(transform.GetWorldMatrix()[2]) * 10.0f * deltaTime);
+			transform.position.x -= Translate.x;
+			transform.position.y -= Translate.y;
+			transform.position.z -= Translate.z;
 		}
 
 		if (keysPressed[SDLK_LEFT])
@@ -71,7 +72,7 @@ public:
 			transform.rotation.x = 30;
 
 		forward = glm::vec3(transform.GetWorldMatrix()[2]);
-		
+		//up = glm::vec3(transform.GetWorldMatrix()[1]);
 	}
 
 	Camera()
