@@ -78,6 +78,15 @@ Core::Core(int width, int height)
 	//the depth test to go
 	glDepthFunc(GL_LEQUAL);
 
+	//Enable Culling
+	glEnable(GL_CULL_FACE);
+
+	//Back face culling
+	glCullFace(GL_BACK);
+
+	//GL_CCW for counter clock-wise
+	glFrontFace(GL_CCW);
+
 	//Turn on the best perspective correction
 	glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
 
@@ -262,6 +271,7 @@ void Core::Update()
 
 void Core::Render()
 {
+	triangleCounter = 0;
 	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -279,13 +289,16 @@ void Core::Render()
 
 	if (debugMode)
 	{
-		font->Render("FPS: ", 0, 0, 24);
+		std::string fps = "FPS: " + std::to_string(FPS);
+		font->Render(fps.c_str(), 0, 0, 24);
+		std::string triangles = "Triangles: " + std::to_string(triangleCounter);
+		font->Render(triangles.c_str(), 0, 30, 24);
 	}
 }
 
 void Core::RenderGameObjects(std::shared_ptr<GameObject> g)
 {
-	std::shared_ptr<Mesh>m = g->GetComponent<Mesh>();
+	std::shared_ptr<Mesh> m = g->GetComponent<Mesh>();
 	if (m != nullptr)
 	{
 		glUseProgram(m->GetMaterial()->GetShader());
@@ -294,8 +307,10 @@ void Core::RenderGameObjects(std::shared_ptr<GameObject> g)
 		GLint texture0Location = glGetUniformLocation(m->GetMaterial()->GetShader(), "texture0");
 		GLint cubeTexture = glGetUniformLocation(m->GetMaterial()->GetShader(), "cubeTexture");
 		GLint modelLocation = glGetUniformLocation(m->GetMaterial()->GetShader(), "Model");
+		GLint cameraPosition = glGetUniformLocation(m->GetMaterial()->GetShader(), "cameraPosition");
 
-		glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(g->GetMVPMatrix()));
+		glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(g->transform.GetWorldMatrix()));
+		glUniform3fv(cameraPosition, 1, value_ptr(MainCamera->transform.position.ConvertToVec3()));
 
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, m->GetMaterial()->GetTexture());
@@ -317,9 +332,7 @@ void Core::RenderGameObjects(std::shared_ptr<GameObject> g)
 
 		GLint specularLightColourLocation = glGetUniformLocation(m->GetMaterial()->GetShader(), "specularLightColour");
 		GLint specularLightMaterialLocation = glGetUniformLocation(m->GetMaterial()->GetShader(), "specularMaterialColour");
-		GLint specularPowerLocation = glGetUniformLocation(m->GetMaterial()->GetShader(), "specularPower");
-
-			
+		GLint specularPowerLocation = glGetUniformLocation(m->GetMaterial()->GetShader(), "specularPower");			
 
 		glUniform4fv(ambientLightColourLocation, 1, value_ptr(MainLight->ambientLightColor.ConvertToVec4()));
 		glUniform4fv(ambientMaterialColourLocation, 1, value_ptr(m->GetMaterial()->ambientMaterial.ConvertToVec4()));
@@ -338,6 +351,7 @@ void Core::RenderGameObjects(std::shared_ptr<GameObject> g)
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m->EBO);
 
 		glDrawElements(GL_TRIANGLES, m->indices.size(), GL_UNSIGNED_INT, 0);
+		triangleCounter += m->indices.size() / 3;
 	}
 
 	for (std::shared_ptr<GameObject> j : g->GetChildren())

@@ -17,6 +17,7 @@ bool Mesh::LoadFBX(std::string filename, std::shared_ptr<Material> mat)
 	//Call the initalise method which will load the contents of the fbx file
 	if (!importer->Initialize(filename.c_str(), -1, sdkManager->GetIOSettings()))
 	{
+		std::cout << "Could not find file " << filename << std::endl;
 		return false;
 	}
 

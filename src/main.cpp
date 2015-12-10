@@ -46,6 +46,13 @@ int main(int argc, char *argv[])
 	obj2->transform.rotation = Vector3(0, 0, 0);
 	obj2->transform.scale = Vector3(0.01f, 0.01f, 0.01f);
 
+	//Teapot
+	std::shared_ptr<GameObject> obj3 = engine->Instantiate();
+	std::shared_ptr<Mesh> m3 = obj3->AddComponent<Mesh>();
+	std::shared_ptr<Material> mat2 = std::shared_ptr<Material>(new Material(SHADER_PATH + "specularVS.glsl", SHADER_PATH + "specularFS.glsl"));
+	m3->LoadFBX(MODEL_PATH + "utah-teapot.fbx", mat2);
+	obj3->transform.scale = Vector3(1, 1, 1);
+
 	//Enviorment
 	std::shared_ptr<GameObject> environmentObj = engine->Instantiate();
 	std::shared_ptr<Mesh> enviroMesh = environmentObj->AddComponent<Mesh>();

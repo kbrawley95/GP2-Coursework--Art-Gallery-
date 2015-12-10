@@ -46,6 +46,8 @@ private:
 	int fpsCounter = 0;
 	int fpsTimer = 0;
 
+	int triangleCounter = 0;
+
 	void RenderGameObjects(std::shared_ptr<GameObject> g);
 	void Update();
 	void Render();
