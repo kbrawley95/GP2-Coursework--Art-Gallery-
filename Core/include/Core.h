@@ -24,6 +24,11 @@ public:
 	Core(int width, int height);
 	~Core();
 
+	bool GetRun()
+	{
+		return run;
+	}
+
 	void Start();
 	void ChangeResolution(int w, int h, bool fullscreen);
 	std::shared_ptr<GameObject> Instantiate();
@@ -34,6 +39,7 @@ private:
 	SDL_GLContext context;
 	int currentTime;
 	int prevTime;
+	bool run;
 
 	int count = 0;
 	int fpsCounter = 0;
@@ -43,6 +49,7 @@ private:
 	void Update();
 	void Render();
 	void Input(SDL_Event* e);
+	
 };
 
 #endif

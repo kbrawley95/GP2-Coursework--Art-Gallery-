@@ -115,7 +115,8 @@ void Core::Start()
 		}
 	}
 	SDL_Event events;
-	bool run = true;
+
+	run = true;
 	while (run)
 	{
 		while (SDL_PollEvent(&events))
@@ -132,7 +133,7 @@ void Core::Start()
 					break;
 
 				case SDLK_TAB:
-					ChangeResolution(2560, 1440, true);
+					ChangeResolution(1920, 1080, true);
 					break;
 				}
 			}
