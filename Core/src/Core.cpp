@@ -95,8 +95,6 @@ Core::Core(int width, int height)
 	std::string exeDirectory = exeFullFilename.substr(0, exeFullFilename.find_last_of("\\"));
 	SetCurrentDirectory(exeDirectory.c_str());
 #endif
-
-	font = LoadFont("Hello World", FONT_PATH + "OratorStd.otf", { 255, 255, 255, 255 }, 16);
 }
 
 Core::~Core()
@@ -108,6 +106,10 @@ Core::~Core()
 
 void Core::Start()
 {
+	//Load Font
+	std::string text = FONT_PATH + "Holstein.dds";
+	font = std::shared_ptr<Text2D>(new Text2D(text.c_str()));
+	FPS = 0;
 	std::cout << std::endl << "[Main Loop Started]" << std::endl;
 
 	for (auto i = GameObjects.begin(); i != GameObjects.end(); ++i)
@@ -144,7 +146,6 @@ void Core::Start()
 					break;
 				case SDLK_F1:
 					debugMode = !debugMode;
-					std::cout << "Debug Mode: " << debugMode << std::endl;
 					break;
 				}
 			}
@@ -278,49 +279,7 @@ void Core::Render()
 
 	if (debugMode)
 	{
-		RenderTexture(font, 0, 0, nullptr);
-	}
-}
-
-SDL_Texture* Core::LoadFont(const std::string &message, const std::string &fontFile, SDL_Color color, int fontSize)
-{
-	//Open the font
-	TTF_Font *font = TTF_OpenFont(fontFile.c_str(), fontSize);
-	if (font == nullptr){
-		std::cout << "TTF_OpenFont" << std::endl;
-		return nullptr;
-	}
-	//We need to first render to a surface as that's what TTF_RenderText
-	//returns, then load that surface into a texture
-	SDL_Surface *surf = TTF_RenderText_Blended(font, message.c_str(), color);
-	if (surf == nullptr){
-		TTF_CloseFont(font);
-		std::cout << "TTF_RenderText" << std::endl;
-		return nullptr;
-	}
-	SDL_Texture *texture = SDL_CreateTextureFromSurface(SDL_GetRenderer(window), surf);
-	if (texture == nullptr){
-		std::cout << "CreateTexture" << std::endl;
-	}
-	//Clean up the surface and font
-	SDL_FreeSurface(surf);
-	TTF_CloseFont(font);
-	return texture;
-}
-
-void Core::RenderTexture(SDL_Texture *tex, int x, int y, SDL_Rect *clip)
-{
-	SDL_Rect dst;
-	dst.x = x;
-	dst.y = y;
-	if (clip != nullptr)
-	{
-		dst.w = clip->w;
-		dst.h = clip->h;
-	}
-	else 
-	{
-		SDL_QueryTexture(tex, NULL, NULL, &dst.w, &dst.h);
+		font->Render("FPS: ", 0, 0, 24);
 	}
 }
 

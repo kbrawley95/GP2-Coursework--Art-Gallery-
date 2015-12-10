@@ -46,7 +46,6 @@ private:
 	bool CheckForCompilerErrors(GLuint shaderProgram);
 	bool CheckForLinkErrors(GLuint program);
 	GLuint LoadTextureFromFile(const std::string& filename);
-	
 	GLuint ConvertSDLSurfaceToTexture(SDL_Surface * surface);
 };
 

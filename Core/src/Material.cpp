@@ -84,16 +84,6 @@ GLuint Material::LoadCubemapTexture(const std::string& posX, const std::string& 
 
 void Material::LoadCubeMapFace(const std::string& filename, GLenum face)
 {
-	/*SDL_Surface* imageSurface = IMG_Load(filename.c_str());
-
-	GLenum	textureFormat = GL_RGB;
-	GLenum	internalFormat = GL_RGB8;
-
-
-	glTexImage2D(face, 0, internalFormat, imageSurface->w, imageSurface->h, 0, textureFormat, GL_UNSIGNED_BYTE, imageSurface->pixels);
-
-	SDL_FreeSurface(imageSurface);*/
-
 	SDL_Surface	*imageSurface = IMG_Load(filename.c_str());
 	if (!imageSurface){
 
