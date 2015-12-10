@@ -19,20 +19,37 @@ public:
 
 	glm::mat4x4 GetWorldMatrix()
 	{
-		glm::mat4x4 pos = glm::translate(glm::mat4x4(1.0f), position.ConvertToVec3());
 		glm::mat4x4 sca = glm::scale(glm::mat4x4(1.0f), scale.ConvertToVec3());
 
-		glm::mat4x4 rot = glm::rotate(glm::mat4x4(1.0f), ToDegree(rotation.x), glm::vec3(1.0f, 0.0f, 0.0f))*
-			glm::rotate(glm::mat4x4(1.0f), ToDegree(rotation.y), glm::vec3(0.0f, 1.0f, 0.0f))*
-			glm::rotate(glm::mat4x4(1.0f), ToDegree(rotation.z), glm::vec3(0.0f, 0.0f, 1.0f));
+		glm::mat4x4 rot = glm::mat4x4(1.0f);
+		rot = glm::rotate(rot, ToRadians(rotation.z), glm::vec3(0.0f, 0.0f, 1.0f));
+		rot = glm::rotate(rot, ToRadians(rotation.y), glm::vec3(0.0f, 1.0f, 0.0f));
+		rot = glm::rotate(rot, ToRadians(rotation.x), glm::vec3(1.0f, 0.0f, 0.0f));
+
+		glm::mat4x4 pos = glm::translate(glm::mat4x4(1.0f), position.ConvertToVec3());
 	
 		return sca * rot * pos;
 	}
 
-private:
-	float ToDegree(float r)
+	Vector3 GetForward()
 	{
-		return (r / 180.0f) * glm::pi<float>();
+		return Vector3(glm::vec3(GetWorldMatrix()[2]));
+	}
+
+	Vector3 GetUp()
+	{
+		return Vector3(glm::vec3(GetWorldMatrix()[1]));
+	}
+
+private:
+	float ToRadians(float d)
+	{
+		return (d / 180.0f) * glm::pi<float>();
+	}
+
+	float ToDegrees(float r)
+	{
+		return (r / glm::pi<float>()) * 180.0f;
 	}
 };
 

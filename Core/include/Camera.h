@@ -24,43 +24,26 @@ public:
 			transform.position.y += Translate.y;
 			transform.position.z += Translate.z;
 		}
-		else if (keysPressed[SDLK_d])
+		if (keysPressed[SDLK_d])
 		{
 			Vector3 Translate = Vector3(glm::vec3(transform.GetWorldMatrix()[0]) * 10.0f * deltaTime);
 			transform.position.x -= Translate.x;
 			transform.position.y -= Translate.y;
 			transform.position.z -= Translate.z;
 		}
-		else if (keysPressed[SDLK_w])
+		if (keysPressed[SDLK_w])
 		{
 			Vector3 Translate = Vector3(glm::vec3(transform.GetWorldMatrix()[2]) * 10.0f * deltaTime);
 			transform.position.x += Translate.x;
 			transform.position.y += Translate.y;
 			transform.position.z += Translate.z;
 		}
-		else if (keysPressed[SDLK_s])
+		if (keysPressed[SDLK_s])
 		{
 			Vector3 Translate = Vector3(glm::vec3(transform.GetWorldMatrix()[2]) * 10.0f * deltaTime);
 			transform.position.x -= Translate.x;
 			transform.position.y -= Translate.y;
 			transform.position.z -= Translate.z;
-		}
-
-		if (keysPressed[SDLK_LEFT])
-		{
-			transform.rotation.y += 10.0f*deltaTime;
-		}
-		else if (keysPressed[SDLK_RIGHT])
-		{
-			transform.rotation.y -= 10.0f*deltaTime;
-		}
-		else if (keysPressed[SDLK_UP])
-		{
-			transform.rotation.z += 10.0f*deltaTime;
-		}
-		else if (keysPressed[SDLK_DOWN])
-		{
-			transform.rotation.z -= 10.0f*deltaTime;
 		}
 
 		transform.rotation.y -= mouseDelta.x;
@@ -72,7 +55,7 @@ public:
 			transform.rotation.x = 30;
 
 		forward = glm::vec3(transform.GetWorldMatrix()[2]);
-		//up = glm::vec3(transform.GetWorldMatrix()[1]);
+		up = glm::vec3(transform.GetWorldMatrix()[1]);
 	}
 
 	Camera()
