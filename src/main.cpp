@@ -13,11 +13,11 @@ Vector2 mouseDelta;
 
 int main(int argc, char *argv[])
 {
-	//Setup Engine
+	//Setup engine
 	Core* engine = new Core(800, 600);
 	engine->lockCursor = true;
 
-	//Main Light
+	//Main light
 	MainLight = std::shared_ptr<DirectionalLight>(new DirectionalLight());
 
 	//Main camera
@@ -28,7 +28,7 @@ int main(int argc, char *argv[])
 	//Setup skybox
 	engine->SetSkyBox(TEXTURE_PATH + "winterplanetft.png", TEXTURE_PATH + "winterplanetbk.png", TEXTURE_PATH + "winterplanetlf.png", TEXTURE_PATH + "winterplanetrt.png", TEXTURE_PATH + "winterplanetup.png", TEXTURE_PATH + "winterplanetdn.png");
 	
-	//armored car
+	//Armored car
 	std::shared_ptr<GameObject> obj = engine->Instantiate();
 	std::shared_ptr<Mesh> m = obj->AddComponent<Mesh>();
 	std::shared_ptr<Material> objMat = std::shared_ptr<Material>(new Material(SHADER_PATH + "textureVS.glsl", SHADER_PATH + "textureFS.glsl"));
@@ -36,7 +36,7 @@ int main(int argc, char *argv[])
 	m->LoadFBX(MODEL_PATH + "armoredrecon.fbx", objMat);
 	obj->transform.position = Vector3(0,0,30);
 
-	//pickup truck
+	//Pickup truck
 	std::shared_ptr<GameObject> obj2 = engine->Instantiate();
 	std::shared_ptr<Mesh> m2 = obj2->AddComponent<Mesh>();
 	std::shared_ptr<Material> mat = std::shared_ptr<Material>(new Material(SHADER_PATH + "textureVS.glsl", SHADER_PATH + "textureFS.glsl"));
@@ -55,7 +55,6 @@ int main(int argc, char *argv[])
 	environmentObj->transform.position = Vector3(0, -50, 0);
 	environmentObj->transform.rotation = Vector3(270,0 , 0);
 
-	//Start Game
+	//Start game
 	engine->Start();
 }
-

@@ -252,7 +252,7 @@ GLuint Material::LoadTextureFromFile(const std::string&	filename)
 GLuint Material::ConvertSDLSurfaceToTexture(SDL_Surface * surface)
 {
 	GLuint textureID = 0;
-	GLint		nOfColors = surface->format->BytesPerPixel;
+	GLint nOfColors = surface->format->BytesPerPixel;
 
 	GLenum	textureFormat = GL_RGB;
 	GLenum	internalFormat = GL_RGB8;

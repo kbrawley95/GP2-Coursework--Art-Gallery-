@@ -17,7 +17,7 @@ class Core
 public:
 	bool lockCursor;
 	bool debugMode;
-
+	SDL_Texture* font;
 	int WIDTH;
 	int HEIGHT;
 	int FPS;
@@ -49,6 +49,8 @@ private:
 	void Update();
 	void Render();
 	void Input(SDL_Event* e);
+	void RenderTexture(SDL_Texture *tex, int x, int y, SDL_Rect *clip);
+	SDL_Texture* LoadFont(const std::string &message, const std::string &fontFile, SDL_Color color, int fontSize);
 	
 };
 
