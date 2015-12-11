@@ -22,12 +22,12 @@ int main(int argc, char *argv[])
 
 	//Main camera
 	MainCamera = std::shared_ptr<Camera>(new Camera());
-	MainCamera->transform.position = Vector3(0, 3, 100);
+	MainCamera->transform.position = Vector3(0, 0, 0);
 	MainCamera->transform.rotation = Vector3(0, 0, 0);
 
 	//Setup skybox
 	engine->SetSkyBox(TEXTURE_PATH + "winterplanetft.png", TEXTURE_PATH + "winterplanetbk.png", TEXTURE_PATH + "winterplanetlf.png", TEXTURE_PATH + "winterplanetrt.png", TEXTURE_PATH + "winterplanetup.png", TEXTURE_PATH + "winterplanetdn.png");
-	
+
 	//Armored car
 	std::shared_ptr<GameObject> obj = engine->Instantiate();
 	std::shared_ptr<Mesh> m = obj->AddComponent<Mesh>();
