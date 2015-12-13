@@ -310,7 +310,7 @@ void Core::RenderGameObjects(std::shared_ptr<GameObject> g)
 		GLint cameraPosition = glGetUniformLocation(m->GetMaterial()->GetShader(), "cameraPosition");
 
 		glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(g->transform.GetWorldMatrix()));
-		glUniform3fv(cameraPosition, 1, glm::value_ptr(MainCamera->transform.position.ConvertToVec3()));
+		glUniform3fv(cameraPosition, 1, glm::value_ptr(MainCamera->transform.GetWorldMatrix()));
 
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, m->GetMaterial()->GetTexture());
