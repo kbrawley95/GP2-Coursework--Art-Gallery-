@@ -16,7 +16,7 @@ bool Camera::FrustumCulling(std::vector<Vertex> vertices, glm::vec3 pos)
 {
 	CumputePlanes();
 
-	for (int i = 0; i < 1; i++)
+	for (int i = 0; i < 6; i++)
 	{
 		for (int k = 0; k < vertices.size(); k++)
 		{
