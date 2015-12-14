@@ -31,7 +31,7 @@ int main(int argc, char *argv[])
 	//Armored car
 	std::shared_ptr<GameObject> obj = engine->Instantiate();
 	std::shared_ptr<Mesh> m = obj->AddComponent<Mesh>();
-	std::shared_ptr<Material> objMat = std::shared_ptr<Material>(new Material(SHADER_PATH + "textureVS.glsl", SHADER_PATH + "textureFS.glsl"));
+	std::shared_ptr<Material> objMat = std::shared_ptr<Material>(new Material(SHADER_PATH + "textureSpecularVS.glsl", SHADER_PATH + "textureSpecularFS.glsl"));
 	objMat->LoadTexture(TEXTURE_PATH + "armoredrecon_diff.png");
 	m->LoadFBX(MODEL_PATH + "armoredrecon.fbx", objMat);
 	obj->transform.position = Vector3(0,0,30);
@@ -39,19 +39,12 @@ int main(int argc, char *argv[])
 	//Pickup truck
 	std::shared_ptr<GameObject> obj2 = engine->Instantiate();
 	std::shared_ptr<Mesh> m2 = obj2->AddComponent<Mesh>();
-	std::shared_ptr<Material> mat = std::shared_ptr<Material>(new Material(SHADER_PATH + "textureVS.glsl", SHADER_PATH + "textureFS.glsl"));
+	std::shared_ptr<Material> mat = std::shared_ptr<Material>(new Material(SHADER_PATH + "textureSpecularVS.glsl", SHADER_PATH + "textureSpecularFS.glsl"));
 	mat->LoadTexture(TEXTURE_PATH + "truck_color-blue.png");
 	m2->LoadFBX(MODEL_PATH + "L200-FBX.fbx", mat);
 	obj2->transform.position = Vector3(0, -3, 60);
 	obj2->transform.rotation = Vector3(0, 0, 0);
 	obj2->transform.scale = Vector3(0.01f, 0.01f, 0.01f);
-
-	//Teapot
-	std::shared_ptr<GameObject> obj3 = engine->Instantiate();
-	std::shared_ptr<Mesh> m3 = obj3->AddComponent<Mesh>();
-	std::shared_ptr<Material> mat2 = std::shared_ptr<Material>(new Material(SHADER_PATH + "specularVS.glsl", SHADER_PATH + "specularFS.glsl"));
-	m3->LoadFBX(MODEL_PATH + "utah-teapot.fbx", mat2);
-	obj3->transform.scale = Vector3(1, 1, 1);
 
 	//Enviorment
 	std::shared_ptr<GameObject> environmentObj = engine->Instantiate();

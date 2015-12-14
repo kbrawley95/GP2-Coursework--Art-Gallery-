@@ -15,7 +15,7 @@ public:
 
 	DirectionalLight()
 	{
-		direction = Vector3(0.0f, 0.0f, 1.0f);
+		direction = Vector3(0.0f, -0.5f, 0.5f);
 		ambientLightColor = Vector4(1.0f, 1.0f, 1.0f, 1.0f);
 		diffuseLightColor = Vector4(1.0f, 1.0f, 1.0f, 1.0f);
 		specularLightColor = Vector4(1.0f, 1.0f, 1.0f, 1.0f);

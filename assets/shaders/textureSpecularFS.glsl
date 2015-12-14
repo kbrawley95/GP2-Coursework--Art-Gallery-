@@ -3,6 +3,7 @@
 out vec4 FragColor;
 in vec3 worldNormal;
 in vec3 cameraDirectionOut;
+in vec2 vertexTexCoordsOut;
 
 uniform vec3 lightDirection;
 
@@ -14,6 +15,7 @@ uniform float specularPower;
 uniform vec4 ambientLightColour;
 uniform vec4 diffuseLightColour;
 uniform vec4 specularLightColour;
+uniform	sampler2D texture0;
 
 void main()
 {
@@ -25,4 +27,6 @@ void main()
 	FragColor = (ambientMaterialColour*ambientLightColour) +
 	(diffuseMaterialColour*diffuseLightColour*diffuseTerm) +
 	(specularMaterialColour*specularLightColour*specularTerm);
+
+	FragColor = FragColor * texture(texture0,	vertexTexCoordsOut);
 }

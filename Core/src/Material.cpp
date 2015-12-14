@@ -2,9 +2,9 @@
 
 Material::Material(std::string vsPath, std::string fsPath)
 {
-	ambientMaterial = glm::vec4(1.0f, 0.3f, 0.3f, 1.0f);
-	diffuseMaterial = glm::vec4(1.0f, 0.0f, 0.0f, 1.0f);
-	specularMaterial = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
+	ambientMaterial = Vector4(1.0f, 1.0f, 1.0f, 1.0f);
+	diffuseMaterial = Vector4(1.0f, 1.0f, 1.0f, 1.0f);
+	specularMaterial = Vector4(1.0f, 1.0f, 1.0f, 1.0f);
 	specularPower = 25.0f;
 
 	environmentMap = 0;
@@ -28,6 +28,7 @@ Material::Material(std::string vsPath, std::string fsPath)
 	glBindAttribLocation(shaderProgram, 0, "vertexPosition");
 	glBindAttribLocation(shaderProgram, 1, "vertexColour");
 	glBindAttribLocation(shaderProgram, 2, "vertexTexCoords");
+	glBindAttribLocation(shaderProgram, 3, "vertexNormal");
 
 	glLinkProgram(shaderProgram);
 	CheckForLinkErrors(shaderProgram);
@@ -38,6 +39,7 @@ Material::Material(std::string vsPath, std::string fsPath)
 
 Material::~Material()
 {
+	glDeleteTextures(1, &diffuseMap);
 	glDeleteTextures(1, &environmentMap);
 }
 

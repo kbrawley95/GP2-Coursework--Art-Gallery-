@@ -63,26 +63,6 @@ struct Vector3
 		z = c;
 	}
 
-	Vector3 operator+(Vector3 a)
-	{
-		return{ x + a.x, y + a.y, z + a.z };
-	}
-
-	Vector3 operator+=(const Vector3 a)
-	{
-		return{ x + a.x, y + a.y, z + a.z };
-	}
-
-	Vector3 operator*(float a)
-	{
-		return{ x * a, y * a, z * a };
-	}
-
-	Vector3 operator=(glm::vec3 a)
-	{
-		return{ a.x, a.y, a.z };
-	}
-
 	glm::vec3 ConvertToVec3()
 	{
 		return glm::vec3(x, y, z);
@@ -116,19 +96,14 @@ struct Vector4
 		w = d;
 	}
 
-	Vector4 operator+(Vector4 a)
-	{
-		return{ x + a.x, y + a.y, z + a.z, w + a.w };
-	}
-
-	Vector4 operator=(glm::vec4 a)
-	{
-		return{ a.x, a.y, a.z, a.w };
-	}
-
 	glm::vec4 ConvertToVec4()
 	{
 		return glm::vec4(x, y, z, w);
+	}
+
+	std::string ToString()
+	{
+		return "(" + std::to_string(x) + "," + std::to_string(y) + "," + std::to_string(z) + ", " + std::to_string(w) + ")";
 	}
 };
 

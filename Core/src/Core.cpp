@@ -303,46 +303,45 @@ void Core::RenderGameObjects(std::shared_ptr<GameObject> g)
 	{
 		glUseProgram(m->GetMaterial()->GetShader());
 
-		GLint MVPLocation = glGetUniformLocation(m->GetMaterial()->GetShader(), "MVP");
-		GLint texture0Location = glGetUniformLocation(m->GetMaterial()->GetShader(), "texture0");
-		GLint cubeTexture = glGetUniformLocation(m->GetMaterial()->GetShader(), "cubeTexture");
-		GLint modelLocation = glGetUniformLocation(m->GetMaterial()->GetShader(), "Model");
-		GLint cameraPosition = glGetUniformLocation(m->GetMaterial()->GetShader(), "cameraPosition");
-
-		glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(g->transform.GetWorldMatrix()));
-		glUniform3fv(cameraPosition, 1, glm::value_ptr(MainCamera->transform.GetWorldMatrix()));
-
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, m->GetMaterial()->GetTexture());
 
 		glActiveTexture(GL_TEXTURE1);
 		glBindTexture(GL_TEXTURE_2D, m->GetMaterial()->GetCubeMap());
 
-		glUniformMatrix4fv(MVPLocation, 1, GL_FALSE, glm::value_ptr(g->GetMVPMatrix()));
-		glUniform1i(texture0Location, 0);
-		glUniform1i(cubeTexture, 1);
+		GLint MVPLocation = glGetUniformLocation(m->GetMaterial()->GetShader(), "MVP");
+		GLint texture0Location = glGetUniformLocation(m->GetMaterial()->GetShader(), "texture0");
+		GLint cubeTexture = glGetUniformLocation(m->GetMaterial()->GetShader(), "cubeTexture");
+		GLint modelLocation = glGetUniformLocation(m->GetMaterial()->GetShader(), "Model");
+		GLint cameraPosition = glGetUniformLocation(m->GetMaterial()->GetShader(), "cameraPosition");
 
-		//Lighting
+
 		GLint ambientLightColourLocation = glGetUniformLocation(m->GetMaterial()->GetShader(), "ambientLightColour");
 		GLint ambientMaterialColourLocation = glGetUniformLocation(m->GetMaterial()->GetShader(), "ambientMaterialColour");
 
 		GLint diffuseLightColourLocation = glGetUniformLocation(m->GetMaterial()->GetShader(), "diffuseLightColour");
-		GLint diffuseLightMaterialLocation = glGetUniformLocation(m->GetMaterial()->GetShader(), "diffuseMaterialColour");
+		GLint diffuseMaterialLocation = glGetUniformLocation(m->GetMaterial()->GetShader(), "diffuseMaterialColour");
 		GLint lightDirectionLocation = glGetUniformLocation(m->GetMaterial()->GetShader(), "lightDirection");
 
 		GLint specularLightColourLocation = glGetUniformLocation(m->GetMaterial()->GetShader(), "specularLightColour");
-		GLint specularLightMaterialLocation = glGetUniformLocation(m->GetMaterial()->GetShader(), "specularMaterialColour");
+		GLint specularMaterialLocation = glGetUniformLocation(m->GetMaterial()->GetShader(), "specularMaterialColour");
 		GLint specularPowerLocation = glGetUniformLocation(m->GetMaterial()->GetShader(), "specularPower");			
+
+		glUniformMatrix4fv(MVPLocation, 1, GL_FALSE, glm::value_ptr(g->GetMVPMatrix()));
+		glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(g->transform.GetWorldMatrix()));
+		glUniform3fv(cameraPosition, 1, glm::value_ptr(MainCamera->transform.position.ConvertToVec3()));
+		glUniform1i(texture0Location, 0);
+		glUniform1i(cubeTexture, 1);
 
 		glUniform4fv(ambientLightColourLocation, 1, value_ptr(MainLight->ambientLightColor.ConvertToVec4()));
 		glUniform4fv(ambientMaterialColourLocation, 1, value_ptr(m->GetMaterial()->ambientMaterial.ConvertToVec4()));
 
 		glUniform4fv(diffuseLightColourLocation, 1, value_ptr(MainLight->diffuseLightColor.ConvertToVec4()));
-		glUniform4fv(diffuseLightMaterialLocation, 1, value_ptr(m->GetMaterial()->diffuseMaterial.ConvertToVec4()));
+		glUniform4fv(diffuseMaterialLocation, 1, value_ptr(m->GetMaterial()->diffuseMaterial.ConvertToVec4()));
 		glUniform3fv(lightDirectionLocation, 1, value_ptr(MainLight->direction.ConvertToVec3()));
 
 		glUniform4fv(specularLightColourLocation, 1, value_ptr(MainLight->specularLightColor.ConvertToVec4()));
-		glUniform4fv(specularLightMaterialLocation, 1, value_ptr(m->GetMaterial()->specularMaterial.ConvertToVec4()));
+		glUniform4fv(specularMaterialLocation, 1, value_ptr(m->GetMaterial()->specularMaterial.ConvertToVec4()));
 		glUniform1f(specularPowerLocation, m->GetMaterial()->specularPower);
 
 		//Draw Shit
