@@ -6,6 +6,9 @@
 class Plane
 {
 public:
+	glm::vec3 normal;
+	float distance;
+
 	Plane()
 	{
 
@@ -27,10 +30,6 @@ public:
 	{
 		return glm::dot(point, normal) + distance;
 	}
-
-private:
-	glm::vec3 normal;
-	float distance;
 };
 
 #endif

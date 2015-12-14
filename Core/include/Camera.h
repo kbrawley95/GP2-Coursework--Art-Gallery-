@@ -16,7 +16,7 @@ public:
 	
 	Camera(float fov, float ratio, float zNear, float zFar);
 	void Update();
-	bool FrustumCulling(std::vector<Vertex> vertices, glm::vec3 pos);
+	bool FrustumCulling(glm::vec3 pos);
 	void CumputePlanes();
 
 	void ChangeRatio(float r)

@@ -12,20 +12,16 @@ Camera::Camera(float fov, float ratio, float zNear, float zFar)
 	forward = glm::vec3(transform.GetWorldMatrix()[2]);
 }
 
-bool Camera::FrustumCulling(std::vector<Vertex> vertices, glm::vec3 pos)
+bool Camera::FrustumCulling(glm::vec3 pos)
 {
 	CumputePlanes();
 
-	for (int i = 0; i < 6; i++)
-	{
-		for (int k = 0; k < vertices.size(); k++)
-		{
-			if (planes[i].Distance(vertices[k].position + pos) < 0)
-				return false;
-		}
-	}
+	Plane p = Plane(glm::vec3(0, -1, 0), 0);
 
-	return true;
+	if (p.Distance(pos) < 0)
+		return true;
+
+	return false;
 }
 
 void Camera::CumputePlanes()

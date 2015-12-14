@@ -16,7 +16,7 @@ int main(int argc, char *argv[])
 	//Setup engine
 	Core* engine = new Core(800, 600);
 	engine->lockCursor = true;
-	engine->culling = true;
+	engine->culling = false;
 
 	//Main light
 	MainLight = std::shared_ptr<DirectionalLight>(new DirectionalLight());
@@ -35,8 +35,8 @@ int main(int argc, char *argv[])
 	std::shared_ptr<Material> objMat = std::shared_ptr<Material>(new Material(SHADER_PATH + "textureSpecularVS.glsl", SHADER_PATH + "textureSpecularFS.glsl"));
 	objMat->LoadTexture(TEXTURE_PATH + "armoredrecon_diff.png");
 	m->LoadFBX(MODEL_PATH + "armoredrecon.fbx", objMat);
-	obj->transform.position = Vector3(0,0,30);
-	/*
+	obj->transform.position = Vector3(0,5,30);
+	
 	//Pickup truck
 	std::shared_ptr<GameObject> obj2 = engine->Instantiate();
 	std::shared_ptr<Mesh> m2 = obj2->AddComponent<Mesh>();
@@ -56,7 +56,7 @@ int main(int argc, char *argv[])
 	enviroMesh->LoadFBX(MODEL_PATH + "Street environment_V01.fbx", enviroMat);
 	environmentObj->transform.position = Vector3(0, -50, 0);
 	environmentObj->transform.rotation = Vector3(270,0 , 0);
-	*/
+	
 	//Start game
 	engine->Start();
 }
