@@ -9,7 +9,7 @@ Material::Material(std::string vsPath, std::string fsPath)
 
 	environmentMap = 0;
 
-	std::cout << "Loading " << std::endl;
+	std::cout << "Loading Shaders " << std::endl;
 	std::cout << "-" << vsPath << std::endl;
 	std::cout << "-" << fsPath << std::endl << std::endl;
 	GLuint vertexShaderProgram = 0;

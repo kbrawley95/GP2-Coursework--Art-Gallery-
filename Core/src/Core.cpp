@@ -5,6 +5,7 @@ Core::Core(int width, int height)
 	std::cout << "Starting up" << std::endl;
 	lockCursor = false;
 	debugMode = true;
+	culling = true;
 	WIDTH = width;
 	HEIGHT = height;
 
@@ -180,7 +181,7 @@ void Core:: ChangeResolution(int w, int h, bool fullscreen)
 {
 	WIDTH = w;
 	HEIGHT = h;
-	MainCamera->aspectRatio = w / h;
+	MainCamera->ChangeRatio(w / h);
 	SDL_SetWindowSize(window, WIDTH, HEIGHT);
 	glViewport(0, 0, (GLsizei)WIDTH, (GLsizei)HEIGHT);
 	if (fullscreen)
@@ -191,7 +192,7 @@ void Core:: ChangeResolution(int w, int h, bool fullscreen)
 
 void Core::SetSkyBox(std::string front, std::string back, std::string left, std::string right, std::string top, std::string bottom)
 {
-	SkyBox = std::shared_ptr<GameObject>(new GameObject());
+	SkyBox = std::shared_ptr<GameObject>(new GameObject("SkyBox"));
 	SkyBox->transform.position = Vector3(0, 0, -40);
 	std::shared_ptr<Mesh> skyboxMesh = SkyBox->AddComponent<Mesh>();
 	skyboxMesh->vertices.clear();
@@ -301,56 +302,59 @@ void Core::RenderGameObjects(std::shared_ptr<GameObject> g)
 	std::shared_ptr<Mesh> m = g->GetComponent<Mesh>();
 	if (m != nullptr)
 	{
-		glUseProgram(m->GetMaterial()->GetShader());
+		if (!culling || MainCamera->FrustumCulling(m->vertices, glm::vec3(g->transform.GetWorldMatrix()[3])) || g->name == "SkyBox")
+		{
+			glUseProgram(m->GetMaterial()->GetShader());
 
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, m->GetMaterial()->GetTexture());
+			glActiveTexture(GL_TEXTURE0);
+			glBindTexture(GL_TEXTURE_2D, m->GetMaterial()->GetTexture());
 
-		glActiveTexture(GL_TEXTURE1);
-		glBindTexture(GL_TEXTURE_2D, m->GetMaterial()->GetCubeMap());
+			glActiveTexture(GL_TEXTURE1);
+			glBindTexture(GL_TEXTURE_2D, m->GetMaterial()->GetCubeMap());
 
-		GLint MVPLocation = glGetUniformLocation(m->GetMaterial()->GetShader(), "MVP");
-		GLint texture0Location = glGetUniformLocation(m->GetMaterial()->GetShader(), "texture0");
-		GLint cubeTexture = glGetUniformLocation(m->GetMaterial()->GetShader(), "cubeTexture");
-		GLint modelLocation = glGetUniformLocation(m->GetMaterial()->GetShader(), "Model");
-		GLint cameraPosition = glGetUniformLocation(m->GetMaterial()->GetShader(), "cameraPosition");
+			GLint MVPLocation = glGetUniformLocation(m->GetMaterial()->GetShader(), "MVP");
+			GLint texture0Location = glGetUniformLocation(m->GetMaterial()->GetShader(), "texture0");
+			GLint cubeTexture = glGetUniformLocation(m->GetMaterial()->GetShader(), "cubeTexture");
+			GLint modelLocation = glGetUniformLocation(m->GetMaterial()->GetShader(), "Model");
+			GLint cameraPosition = glGetUniformLocation(m->GetMaterial()->GetShader(), "cameraPosition");
 
 
-		GLint ambientLightColourLocation = glGetUniformLocation(m->GetMaterial()->GetShader(), "ambientLightColour");
-		GLint ambientMaterialColourLocation = glGetUniformLocation(m->GetMaterial()->GetShader(), "ambientMaterialColour");
+			GLint ambientLightColourLocation = glGetUniformLocation(m->GetMaterial()->GetShader(), "ambientLightColour");
+			GLint ambientMaterialColourLocation = glGetUniformLocation(m->GetMaterial()->GetShader(), "ambientMaterialColour");
 
-		GLint diffuseLightColourLocation = glGetUniformLocation(m->GetMaterial()->GetShader(), "diffuseLightColour");
-		GLint diffuseMaterialLocation = glGetUniformLocation(m->GetMaterial()->GetShader(), "diffuseMaterialColour");
-		GLint lightDirectionLocation = glGetUniformLocation(m->GetMaterial()->GetShader(), "lightDirection");
+			GLint diffuseLightColourLocation = glGetUniformLocation(m->GetMaterial()->GetShader(), "diffuseLightColour");
+			GLint diffuseMaterialLocation = glGetUniformLocation(m->GetMaterial()->GetShader(), "diffuseMaterialColour");
+			GLint lightDirectionLocation = glGetUniformLocation(m->GetMaterial()->GetShader(), "lightDirection");
 
-		GLint specularLightColourLocation = glGetUniformLocation(m->GetMaterial()->GetShader(), "specularLightColour");
-		GLint specularMaterialLocation = glGetUniformLocation(m->GetMaterial()->GetShader(), "specularMaterialColour");
-		GLint specularPowerLocation = glGetUniformLocation(m->GetMaterial()->GetShader(), "specularPower");			
+			GLint specularLightColourLocation = glGetUniformLocation(m->GetMaterial()->GetShader(), "specularLightColour");
+			GLint specularMaterialLocation = glGetUniformLocation(m->GetMaterial()->GetShader(), "specularMaterialColour");
+			GLint specularPowerLocation = glGetUniformLocation(m->GetMaterial()->GetShader(), "specularPower");
 
-		glUniformMatrix4fv(MVPLocation, 1, GL_FALSE, glm::value_ptr(g->GetMVPMatrix()));
-		glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(g->transform.GetWorldMatrix()));
-		glUniform3fv(cameraPosition, 1, glm::value_ptr(MainCamera->transform.position.ConvertToVec3()));
-		glUniform1i(texture0Location, 0);
-		glUniform1i(cubeTexture, 1);
+			glUniformMatrix4fv(MVPLocation, 1, GL_FALSE, glm::value_ptr(g->GetMVPMatrix()));
+			glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(g->transform.GetWorldMatrix()));
+			glUniform3fv(cameraPosition, 1, glm::value_ptr(MainCamera->transform.position.ConvertToVec3()));
+			glUniform1i(texture0Location, 0);
+			glUniform1i(cubeTexture, 1);
 
-		glUniform4fv(ambientLightColourLocation, 1, value_ptr(MainLight->ambientLightColor.ConvertToVec4()));
-		glUniform4fv(ambientMaterialColourLocation, 1, value_ptr(m->GetMaterial()->ambientMaterial.ConvertToVec4()));
+			glUniform4fv(ambientLightColourLocation, 1, value_ptr(MainLight->ambientLightColor.ConvertToVec4()));
+			glUniform4fv(ambientMaterialColourLocation, 1, value_ptr(m->GetMaterial()->ambientMaterial.ConvertToVec4()));
 
-		glUniform4fv(diffuseLightColourLocation, 1, value_ptr(MainLight->diffuseLightColor.ConvertToVec4()));
-		glUniform4fv(diffuseMaterialLocation, 1, value_ptr(m->GetMaterial()->diffuseMaterial.ConvertToVec4()));
-		glUniform3fv(lightDirectionLocation, 1, value_ptr(MainLight->direction.ConvertToVec3()));
+			glUniform4fv(diffuseLightColourLocation, 1, value_ptr(MainLight->diffuseLightColor.ConvertToVec4()));
+			glUniform4fv(diffuseMaterialLocation, 1, value_ptr(m->GetMaterial()->diffuseMaterial.ConvertToVec4()));
+			glUniform3fv(lightDirectionLocation, 1, value_ptr(MainLight->direction.ConvertToVec3()));
 
-		glUniform4fv(specularLightColourLocation, 1, value_ptr(MainLight->specularLightColor.ConvertToVec4()));
-		glUniform4fv(specularMaterialLocation, 1, value_ptr(m->GetMaterial()->specularMaterial.ConvertToVec4()));
-		glUniform1f(specularPowerLocation, m->GetMaterial()->specularPower);
+			glUniform4fv(specularLightColourLocation, 1, value_ptr(MainLight->specularLightColor.ConvertToVec4()));
+			glUniform4fv(specularMaterialLocation, 1, value_ptr(m->GetMaterial()->specularMaterial.ConvertToVec4()));
+			glUniform1f(specularPowerLocation, m->GetMaterial()->specularPower);
 
-		//Draw Shit
-		glBindVertexArray(m->VAO);
-		glBindBuffer(GL_ARRAY_BUFFER, m->VBO);
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m->EBO);
+			//Draw Shit
+			glBindVertexArray(m->VAO);
+			glBindBuffer(GL_ARRAY_BUFFER, m->VBO);
+			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m->EBO);
 
-		glDrawElements(GL_TRIANGLES, m->indices.size(), GL_UNSIGNED_INT, 0);
-		triangleCounter += m->indices.size() / 3;
+			glDrawElements(GL_TRIANGLES, m->indices.size(), GL_UNSIGNED_INT, 0);
+			triangleCounter += m->indices.size() / 3;
+		}
 	}
 
 	for (std::shared_ptr<GameObject> j : g->GetChildren())

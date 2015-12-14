@@ -18,6 +18,7 @@ class Core
 public:
 	bool lockCursor;
 	bool debugMode;
+	bool culling;
 	std::shared_ptr<Text2D> font;
 	int WIDTH;
 	int HEIGHT;

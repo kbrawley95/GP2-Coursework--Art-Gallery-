@@ -5,82 +5,51 @@
 #include "Transform.h"
 #include "Input.h"
 #include "Time.h"
+#include "Vector.h"
+#include "Vertex.h"
+#include "Plane.h"
 
 class Camera
 {
 public:
 	Transform transform;
-	float fov;
-	float aspectRatio;
-	float zNear;
-	float zFar;
+	
+	Camera(float fov, float ratio, float zNear, float zFar);
+	void Update();
+	bool FrustumCulling(std::vector<Vertex> vertices, glm::vec3 pos);
+	void CumputePlanes();
 
-	void Update()
+	void ChangeRatio(float r)
 	{
-		if (keysPressed[SDLK_a])
-		{
-			Vector3 Translate = Vector3(glm::vec3(transform.GetWorldMatrix()[0]) * 10.0f * deltaTime);
-			transform.position.x += Translate.x;
-			transform.position.y += Translate.y;
-			transform.position.z += Translate.z;
-		}
-		if (keysPressed[SDLK_d])
-		{
-			Vector3 Translate = Vector3(glm::vec3(transform.GetWorldMatrix()[0]) * 10.0f * deltaTime);
-			transform.position.x -= Translate.x;
-			transform.position.y -= Translate.y;
-			transform.position.z -= Translate.z;
-		}
-		if (keysPressed[SDLK_w])
-		{
-			Vector3 Translate = Vector3(glm::vec3(transform.GetWorldMatrix()[2]) * 10.0f * deltaTime);
-			transform.position.x += Translate.x;
-			transform.position.y += Translate.y;
-			transform.position.z += Translate.z;
-		}
-		if (keysPressed[SDLK_s])
-		{
-			Vector3 Translate = Vector3(glm::vec3(transform.GetWorldMatrix()[2]) * 10.0f * deltaTime);
-			transform.position.x -= Translate.x;
-			transform.position.y -= Translate.y;
-			transform.position.z -= Translate.z;
-		}
+		ratio = r;
 
-		transform.rotation.y -= mouseDelta.x;
-		transform.rotation.x += mouseDelta.y;
-
-		if (transform.rotation.x < -30)
-			transform.rotation.x = -30;
-		else if (transform.rotation.x > 30)
-			transform.rotation.x = 30;
-
-		forward = glm::vec3(transform.GetWorldMatrix()[2]);
-		up = glm::vec3(transform.GetWorldMatrix()[1]);
+		// compute width and height of the near and far plane sections
+		float tang = glm::tan(fov * 0.5f) * 2;
+		nearPlane.y = zNear * tang;
+		nearPlane.x = nearPlane.y * ratio;
+		farPlane.y = zFar  * tang;
+		farPlane.x = farPlane.y * ratio;
 	}
-
-	Camera()
-	{
-		fov = 45.0f;
-		aspectRatio = 800/ 600;
-		zNear = 0.1f;
-		zFar = 1000.0f;
-		forward = glm::vec3(0.0f, 0.0f, 1.0f);
-		up = glm::vec3(0.0f, 1.0f, 0.0f);
-		transform = Transform();
-	}
-
 	glm::mat4 GetViewMatrix()
 	{
 		return glm::lookAt(transform.position.ConvertToVec3(), transform.position.ConvertToVec3() + forward, up);
 	}
-
 	glm::mat4 GetProjectionMatrix()
 	{
-		return glm::perspective(fov, aspectRatio, zNear, zFar);
+		return glm::perspective(fov, ratio, zNear, zFar);
 	}
+
 private:
+	float fov;
+	float ratio;
+	float zNear;
+	float zFar;
 	glm::vec3 forward;
 	glm::vec3 up;
+	glm::vec3 right;
+	Vector2 nearPlane;
+	Vector2 farPlane;
+	Plane planes[6];
 };
 
 #endif
