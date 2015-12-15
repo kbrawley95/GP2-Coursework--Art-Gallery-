@@ -116,18 +116,17 @@ Core::~Core()
 
 void Core::Start()
 {
+	//Setup frame buffer for post processing
+	std::cout << "Setting up frame buffers for post processing" << std::endl;
+	CreateFramebuffer();
+
 	//Load Font
 	std::string text = FONT_PATH + "Holstein.dds";
 	font = std::shared_ptr<Text2D>(new Text2D(text.c_str()));
 	FPS = 0;
 	std::cout << std::endl << "[Main Loop Started]" << std::endl;
 
-	if (postProcessing)
-	{
-		//Setup frame buffer for post processing
-		std::cout << "Setting up frame buffers for post processing" << std::endl;
-		CreateFramebuffer();
-	}
+	
 
 	for (auto i = GameObjects.begin(); i != GameObjects.end(); ++i)
 	{
@@ -262,9 +261,11 @@ void Core::Update()
 	mouseDelta = Vector2(x, y);
 
 	//Time
+	lastTicks = currentTime;
 	prevTime = currentTime;
 	currentTime = SDL_GetTicks();
 	deltaTime = (currentTime - prevTime) / 1000.0f;
+	totalTime += deltaTime;
 
 	//Calculate FPS
 	if (fpsTimer < currentTime)
@@ -297,28 +298,7 @@ void Core::Render()
 			K->PostRender();
 	}
 
-	if (postProcessing)
-	{
-		//Post Processing
-		glBindFramebuffer(GL_FRAMEBUFFER, 0);
-		//Set the clear colour(background)
-		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-		//clear the colour and depth buffer
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		glUseProgram(frambeBufferShader->GetShader());
-
-		GLint textureLocation = glGetUniformLocation(frambeBufferShader->GetShader(), "texture0");
-
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, FBOTexture);
-		glUniform1i(textureLocation, 0);
-
-		glBindVertexArray(frameBufferVAO);
-		glBindBuffer(GL_ARRAY_BUFFER, frameBufferVBO);
-
-		glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-	}
 	//Debug UI
 	if (debugMode)
 	{
@@ -327,6 +307,8 @@ void Core::Render()
 		std::string triangles = "Triangles: " + std::to_string(triangleCounter);
 		font->Render(triangles.c_str(), 0, 30, 24);
 	}
+
+	RenderPostQuad();
 }
 
 //Render each game object & all of its children
@@ -400,6 +382,34 @@ void Core::RenderGameObjects(std::shared_ptr<GameObject> g)
 		for (std::shared_ptr<Component> K : g->GetComponents())
 			K->PostRender();
 	}
+}
+
+void Core::RenderPostQuad()
+{
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	//Set the clear colour(background)
+	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+	//clear the colour and depth buffer
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	glUseProgram(frambeBufferShader->GetShader());
+
+	GLint textureLocation = glGetUniformLocation(frambeBufferShader->GetShader(), "texture0");
+	GLint timeLocation = glGetUniformLocation(frambeBufferShader->GetShader(), "time");
+	GLint resolutionLocation = glGetUniformLocation(frambeBufferShader->GetShader(), "resolution");
+
+	glUniform1f(timeLocation, totalTime);
+	glUniform2fv(resolutionLocation, 1, value_ptr(screenResolution));
+
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, FBOTexture);
+	glUniform1i(textureLocation, 0);
+
+	glBindVertexArray(frameBufferVAO);
+
+	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+
+	
 }
 
 void Core::CreateFramebuffer()

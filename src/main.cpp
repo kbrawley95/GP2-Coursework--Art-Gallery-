@@ -17,7 +17,6 @@ int main(int argc, char *argv[])
 	Core* engine = new Core(800, 600);
 	engine->lockCursor = true;
 	engine->culling = false;
-	engine->postProcessing = false;
 
 	//Main light
 	MainLight = std::shared_ptr<DirectionalLight>(new DirectionalLight());

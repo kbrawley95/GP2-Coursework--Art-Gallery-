@@ -19,7 +19,6 @@ public:
 	bool lockCursor;
 	bool debugMode;
 	bool culling;
-	bool postProcessing;
 	std::shared_ptr<Text2D> font;
 	int WIDTH;
 	int HEIGHT;
@@ -52,13 +51,19 @@ private:
 	GLuint frameBufferVBO;
 	std::shared_ptr<Material> frambeBufferShader;
 
+	vec2 screenResolution = vec2(WIDTH, HEIGHT);
+
 	int count = 0;
 	int fpsCounter = 0;
 	int fpsTimer = 0;
 
+	int lastTicks = 0;
+	int totalTime = 0;
+
 	int triangleCounter = 0;
 
 	void RenderGameObjects(std::shared_ptr<GameObject> g);
+	void RenderPostQuad();
 	void Update();
 	void Render();
 	void Input(SDL_Event* e);
