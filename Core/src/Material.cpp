@@ -11,11 +11,10 @@ Material::Material(std::string vsPath, std::string fsPath)
 
 	std::cout << "Loading Shaders " << std::endl;
 	std::cout << "-" << vsPath << std::endl;
-	std::cout << "-" << fsPath << std::endl << std::endl;
 	GLuint vertexShaderProgram = 0;
 	vertexShaderProgram = LoadShaderFromFile(vsPath, VERTEX_SHADER);
 	CheckForCompilerErrors(vertexShaderProgram);
-
+	std::cout << "-" << fsPath << std::endl << std::endl;
 	GLuint fragmentShaderProgram = 0;
 	fragmentShaderProgram = LoadShaderFromFile(fsPath, FRAGMENT_SHADER);
 	CheckForCompilerErrors(fragmentShaderProgram);

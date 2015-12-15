@@ -19,6 +19,7 @@ public:
 	bool lockCursor;
 	bool debugMode;
 	bool culling;
+	bool postProcessing;
 	std::shared_ptr<Text2D> font;
 	int WIDTH;
 	int HEIGHT;
@@ -43,6 +44,14 @@ private:
 	int prevTime;
 	bool run;
 
+	//for Framebuffer
+	GLuint FBOTexture;
+	GLuint FBODepthBuffer;
+	GLuint frameBufferObject;
+	GLuint frameBufferVAO;
+	GLuint frameBufferVBO;
+	std::shared_ptr<Material> frambeBufferShader;
+
 	int count = 0;
 	int fpsCounter = 0;
 	int fpsTimer = 0;
@@ -53,7 +62,7 @@ private:
 	void Update();
 	void Render();
 	void Input(SDL_Event* e);
-	
+	void CreateFramebuffer();
 };
 
 #endif

@@ -7,6 +7,12 @@
 class Material
 {
 public:
+	enum SHADER_TYPE
+	{
+		VERTEX_SHADER = GL_VERTEX_SHADER,
+		FRAGMENT_SHADER = GL_FRAGMENT_SHADER
+	};
+
 	Vector4 ambientMaterial;
 	Vector4 diffuseMaterial;
 	Vector4 specularMaterial;
@@ -36,11 +42,6 @@ private:
 	GLuint diffuseMap;
 	GLuint environmentMap;
 
-	enum SHADER_TYPE
-	{
-		VERTEX_SHADER = GL_VERTEX_SHADER,
-		FRAGMENT_SHADER = GL_FRAGMENT_SHADER
-	};
 	GLuint LoadShaderFromMemory(const char * pMem, SHADER_TYPE shaderType);
 	GLuint LoadShaderFromFile(const std::string& filename, SHADER_TYPE shaderType);
 	bool CheckForCompilerErrors(GLuint shaderProgram);
