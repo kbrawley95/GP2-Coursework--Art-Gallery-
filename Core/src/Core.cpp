@@ -159,7 +159,10 @@ void Core::Start()
 					break;
 
 				case SDLK_TAB:
-					ChangeResolution(1920, 1080, true);
+					if (HEIGHT == 1080)
+						ChangeResolution(800, 600, false);
+					else
+						ChangeResolution(1920, 1080, true);
 					break;
 				case SDLK_F1:
 					debugMode = !debugMode;
@@ -300,7 +303,7 @@ void Core::Render()
 	if (postProcessing)
 	{
 		//Post Processing
-		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+		//glBindFramebuffer(GL_FRAMEBUFFER, 0);
 		//Set the clear colour(background)
 		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 		//clear the colour and depth buffer
