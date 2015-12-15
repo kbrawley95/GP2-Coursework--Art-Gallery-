@@ -279,8 +279,106 @@ void Core::Update()
 		fpsCounter++;
 }
 
+void Core::CreateFramebuffer()
+{
+	//Create post processing FBO
+	glActiveTexture(GL_TEXTURE0);
+	glGenTextures(1, &FBOTexture);
+	glBindTexture(GL_TEXTURE_2D, FBOTexture);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, WIDTH, HEIGHT, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+
+
+	glGenRenderbuffers(1, &FBODepthBuffer);
+	glBindRenderbuffer(GL_RENDERBUFFER, FBODepthBuffer);
+	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT32, WIDTH, HEIGHT);
+	glBindRenderbuffer(GL_RENDERBUFFER, 0);
+
+	glGenFramebuffers(1, &frameBufferObject);
+	glBindFramebuffer(GL_FRAMEBUFFER, frameBufferObject);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, FBOTexture, 0);
+	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, FBODepthBuffer);
+
+	GLenum status;
+	if ((status = glCheckFramebufferStatus(GL_FRAMEBUFFER)) != GL_FRAMEBUFFER_COMPLETE)
+	{
+		std::cout << "Issue with Framebuffers" << std::endl;
+	}
+	float vertices[] = {
+		-1, -1,
+		1, -1,
+		-1, 1,
+		1, 1,
+
+	};
+
+	glGenVertexArrays(1, &frameBufferVAO);
+	glBindVertexArray(frameBufferVAO);
+
+	glGenBuffers(1, &frameBufferVBO);
+	glBindBuffer(GL_ARRAY_BUFFER, frameBufferVBO);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(
+		0,					// attribute
+		2,                  // number of elements per vertex, here (x,y)
+		GL_FLOAT,           // the type of each element
+		GL_FALSE,           // take our values as-is
+		0,                  // no extra data between each position
+		0                   // offset of first element
+		);
+
+	std::string vsPath = SHADER_PATH + "simplePostProcessVS.glsl";
+	std::string fsPath = SHADER_PATH + "simplePostProcessFS.glsl";
+	frambeBufferShader = std::shared_ptr<Material>(new Material(vsPath, fsPath));
+
+	//Create Shadow Mapping FBO
+	/*
+	glActiveTexture(GL_TEXTURE0);
+	glGenTextures(1, &ShadowDepthTexture);
+	glBindTexture(GL_TEXTURE_2D, ShadowDepthTexture);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT16, 1024, 1024, 0, GL_DEPTH_COMPONENT, GL_UNSIGNED_BYTE, NULL);
+
+	glGenRenderbuffers(1, &shadowFrameBufferObject);
+	glBindRenderbuffer(GL_RENDERBUFFER, shadowFrameBufferObject);
+	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT32, 1024, 1024);
+	glBindRenderbuffer(GL_RENDERBUFFER, 0);
+	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, shadowFrameBufferObject);
+
+	if ((status = glCheckFramebufferStatus(GL_FRAMEBUFFER)) != GL_FRAMEBUFFER_COMPLETE)
+	{
+		std::cout << "Issue with Framebuffers" << std::endl;
+	}
+
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(
+		0,					// attribute
+		3,                  // number of elements per vertex, here (x,y)
+		GL_FLOAT,           // the type of each element
+		GL_FALSE,           // take our values as-is
+		0,                  // no extra data between each position
+		0                   // offset of first element
+		);
+
+	vsPath = SHADER_PATH + "lightmapGeneratorVS.glsl";
+	fsPath = SHADER_PATH + "lightmapGeneratorFS.glsl";
+	shadowFBOShader = std::shared_ptr<Material>(new Material(vsPath, fsPath));
+	*/
+}
+
+//Main Render Function
 void Core::Render()
 {
+	//RenderShadowMap();
+
 	//Render Scene
 	triangleCounter = 0;
 	glBindFramebuffer(GL_FRAMEBUFFER, frameBufferObject);
@@ -299,9 +397,6 @@ void Core::Render()
 			K->PostRender();
 	}
 
-	
-
-
 	//Debug UI
 	if (debugMode)
 	{
@@ -310,8 +405,6 @@ void Core::Render()
 		std::string triangles = "Triangles: " + std::to_string(triangleCounter);
 		font->Render(triangles.c_str(), 0, 30, 24);
 	}
-
-	
 
 	RenderPostQuad();
 }
@@ -389,6 +482,7 @@ void Core::RenderGameObjects(std::shared_ptr<GameObject> g)
 	}
 }
 
+//Post Processing
 void Core::RenderPostQuad()
 {
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -413,64 +507,23 @@ void Core::RenderPostQuad()
 	glBindVertexArray(frameBufferVAO);
 
 	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-
-	
 }
 
-void Core::CreateFramebuffer()
+//Render Shadow Map
+void Core::RenderShadowMap()
 {
-	glActiveTexture(GL_TEXTURE0);
-	glGenTextures(1, &FBOTexture);
-	glBindTexture(GL_TEXTURE_2D, FBOTexture);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, WIDTH, HEIGHT, 0, GL_RGBA,
-		GL_UNSIGNED_BYTE, NULL);
+	glBindFramebuffer(GL_FRAMEBUFFER, shadowFrameBufferObject);
+	//Set the clear colour(background)
+	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+	//clear the colour and depth buffer
+	glClear(GL_DEPTH_BUFFER_BIT);
 
+	glUseProgram(shadowFBOShader->GetShader());
 
-	glGenRenderbuffers(1, &FBODepthBuffer);
-	glBindRenderbuffer(GL_RENDERBUFFER, FBODepthBuffer);
-	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT32, WIDTH, HEIGHT);
-	glBindRenderbuffer(GL_RENDERBUFFER, 0);
+	GLint MVPLocation = glGetUniformLocation(shadowFBOShader->GetShader(), "MVP");
+	glUniformMatrix4fv(MVPLocation, 1, GL_FALSE, glm::value_ptr(MainLight->projection));
 
-	glGenFramebuffers(1, &frameBufferObject);
-	glBindFramebuffer(GL_FRAMEBUFFER, frameBufferObject);
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, FBOTexture, 0);
-	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, FBODepthBuffer);
-
-	GLenum status;
-	if ((status = glCheckFramebufferStatus(GL_FRAMEBUFFER)) != GL_FRAMEBUFFER_COMPLETE)
-	{
-		std::cout << "Issue with Framebuffers" << std::endl;
-	}
-	float vertices[] = {
-		-1, -1,
-		1, -1,
-		-1, 1,
-		1, 1,
-
-	};
-
-	glGenVertexArrays(1, &frameBufferVAO);
-	glBindVertexArray(frameBufferVAO);
-
-	glGenBuffers(1, &frameBufferVBO);
-	glBindBuffer(GL_ARRAY_BUFFER, frameBufferVBO);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-
-	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(
-		0,  // attribute
-		2,                  // number of elements per vertex, here (x,y)
-		GL_FLOAT,           // the type of each element
-		GL_FALSE,           // take our values as-is
-		0,                  // no extra data between each position
-		0                   // offset of first element
-		);
-
-	std::string vsPath = SHADER_PATH + "simplePostProcessVS.glsl";
-	std::string fsPath = SHADER_PATH + "simplePostProcessFS.glsl";
-	frambeBufferShader = std::shared_ptr<Material>(new Material(vsPath, fsPath));
+	glDrawBuffer(GL_BACK);
+	glBindTexture(GL_TEXTURE_2D, ShadowDepthTexture);
+	//glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 }

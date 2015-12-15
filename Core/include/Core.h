@@ -43,13 +43,18 @@ private:
 	int prevTime;
 	bool run;
 
-	//for Framebuffer
+	//FBO Post Processing
 	GLuint FBOTexture;
 	GLuint FBODepthBuffer;
 	GLuint frameBufferObject;
 	GLuint frameBufferVAO;
 	GLuint frameBufferVBO;
 	std::shared_ptr<Material> frambeBufferShader;
+
+	//FBO Shadows
+	GLuint ShadowDepthTexture;
+	GLuint shadowFrameBufferObject;
+	std::shared_ptr<Material> shadowFBOShader;
 
 	vec2 screenResolution = vec2(WIDTH, HEIGHT);
 
@@ -62,12 +67,13 @@ private:
 
 	int triangleCounter = 0;
 
-	void RenderGameObjects(std::shared_ptr<GameObject> g);
-	void RenderPostQuad();
 	void Update();
 	void Render();
 	void Input(SDL_Event* e);
 	void CreateFramebuffer();
+	void RenderGameObjects(std::shared_ptr<GameObject> g);
+	void RenderPostQuad();
+	void RenderShadowMap();
 };
 
 #endif
